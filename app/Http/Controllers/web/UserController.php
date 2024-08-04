@@ -1,14 +1,21 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\web;
 
 use App\Http\Controllers\Controller;
+use App\Models\GroupMenu;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('ensureTokenIsValid');
+    }
+
     /**
      * Get all Group menus
      * @OA\Get (
@@ -37,9 +44,32 @@ class UserController extends Controller
      * )
      */
 
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(User::with(['typeUser'])->simplePaginate(15));
+
+        $user = Auth::user();
+        $typeUser = $user->typeUser;
+
+        $accesses = $typeUser->getAccess($typeUser->id);
+
+        $currentRoute = $request->path();
+        $currentRouteParts = explode('/', $currentRoute);
+        $lastPart = end($currentRouteParts);
+
+        if (in_array($lastPart, $accesses)) {
+            $groupMenu = GroupMenu::getFilteredGroupMenusSuperior($user->typeofUser_id);
+            $groupMenuLeft = GroupMenu::getFilteredGroupMenus($user->typeofUser_id);
+
+            return view('Modulos.User.index', compact('user', 'groupMenu', 'groupMenuLeft'));
+        } else {
+            abort(403, 'Acceso no autorizado.');
+        }
+    }
+
+    public function all()
+    {
+
+        return response()->json(User::with(['typeUser', 'person'])->whereNotIn('id', [1, 2])->simplePaginate(15));
     }
 
     /**

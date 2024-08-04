@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\web;
 
 use App\Http\Controllers\Controller;
 use App\Models\Optionmenu;
@@ -9,6 +9,11 @@ use Illuminate\Validation\Rule;
 
 class OptionMenuController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('ensureTokenIsValid');
+    }
+    
     /**
      * Get all Option Menus
      * @OA\Get (

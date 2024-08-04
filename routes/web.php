@@ -1,8 +1,10 @@
 <?php
 
-use App\Http\Controllers\Api\GroupMenuController;
-use App\Http\Controllers\Api\TypeUserController;
-use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\web\GroupMenuController;
+use App\Http\Controllers\web\OptionMenuController;
+use App\Http\Controllers\web\PersonController;
+use App\Http\Controllers\web\TypeUserController;
+use App\Http\Controllers\web\UserController;
 use App\Http\Controllers\auth\AuthController;
 use App\Http\Controllers\InicioController;
 use Illuminate\Support\Facades\Route;
@@ -26,35 +28,57 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 });
+Route::middleware(['ensureTokenIsValid'])->group(function () {
+    return view('auth.login');
+});
 
 Route::post('login', [AuthController::class, 'login'])->name('login');
 
 Route::group(['middleware' => ['auth']], function () {
 
+    Route::get('logout', [AuthController::class, 'logout']);
+
     Route::resource('vistaInicio', 'App\Http\Controllers\InicioController');
     Route::get('vistaInicio', [InicioController::class, 'index'])->name('vistaInicio');
-    Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
     //USER
     Route::get('user', [UserController::class, 'index']);
+    Route::get('userAll', [UserController::class, 'all']);
     Route::get('user/{id}', [UserController::class, 'show']);
     Route::post('user', [UserController::class, 'store']);
-    Route::get('user/{id}', [UserController::class, 'update']);
-    Route::get('user/{id}', [UserController::class, 'delete']);
+    Route::put('user/{id}', [UserController::class, 'update']);
+    Route::delete('user/{id}', [UserController::class, 'destroy']);
 
     //GROUP MENU
     Route::get('groupmenu', [GroupMenuController::class, 'index']);
     Route::get('groupmenu/{id}', [GroupMenuController::class, 'show']);
     Route::post('groupmenu', [GroupMenuController::class, 'store']);
-    Route::get('groupmenu/{id}', [GroupMenuController::class, 'update']);
-    Route::get('groupmenu/{id}', [GroupMenuController::class, 'delete']);
+    Route::put('groupmenu/{id}', [GroupMenuController::class, 'update']);
+    Route::delete('groupmenu/{id}', [GroupMenuController::class, 'destroy']);
+
+    //GROUP MENU
+    Route::get('options', [OptionMenuController::class, 'index']);
+    Route::get('options/{id}', [OptionMenuController::class, 'show']);
+    Route::post('options', [OptionMenuController::class, 'store']);
+    Route::put('options/{id}', [OptionMenuController::class, 'update']);
+    Route::delete('options/{id}', [OptionMenuController::class, 'destroy']);
 
     //TYPE USER
-    Route::get('typeuser', [TypeUserController::class, 'index']);
-    Route::get('typeuser/{id}', [TypeUserController::class, 'show']);
-    Route::post('typeuser', [TypeUserController::class, 'store']);
-    Route::get('typeuser/{id}', [TypeUserController::class, 'update']);
-    Route::get('typeuser/{id}', [TypeUserController::class, 'delete']);
-    Route::post('typeuser/setAccess', [TypeUserController::class, 'setAccess']);
+    Route::get('access', [TypeUserController::class, 'index']);
+    Route::get('accessAll', [TypeUserController::class, 'all']);
+    Route::get('access/{id}', [TypeUserController::class, 'show']);
+    Route::post('access', [TypeUserController::class, 'store']);
+    Route::put('access/{id}', [TypeUserController::class, 'update']);
+    Route::delete('access/{id}', [TypeUserController::class, 'destroy']);
+    Route::post('access/setAccess', [TypeUserController::class, 'setAccess']);
 
+     //STUDENTS
+     Route::get('estudiante', [PersonController::class, 'index']);
+     Route::get('estudianteAll', [PersonController::class, 'all']);
+     Route::post('importExcel', [PersonController::class, 'importExcel']);
+ 
+     Route::get('estudiante/{id}', [PersonController::class, 'show']);
+     Route::post('estudiante', [PersonController::class, 'store']);
+     Route::put('estudiante/{id}', [PersonController::class, 'update']);
+     Route::delete('estudiante/{id}', [PersonController::class, 'destroy']);
 });

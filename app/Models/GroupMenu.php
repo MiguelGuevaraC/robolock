@@ -70,7 +70,7 @@ class GroupMenu extends Model
                 $query->where('typeuser_id', $userTypeId);
             });
         }])
-            ->whereNotIn('id', [3])->get()
+            ->whereIn('id', [1, 2, 3,5])->get()
             ->map(function ($groupMenu) use ($userTypeId) {
                 // Filtrar optionMenus según el acceso del usuario
                 $groupMenu->option_menus = $groupMenu->optionMenus->filter(function ($optionMenu) use ($userTypeId) {

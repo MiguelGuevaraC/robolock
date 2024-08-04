@@ -1,14 +1,21 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\web;
 
 use App\Http\Controllers\Controller;
+use App\Models\GroupMenu;
 use App\Models\Person;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class PersonController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('ensureTokenIsValid');
+    }
+
     /**
      * Get all Persons
      * @OA\Get (
@@ -37,11 +44,89 @@ class PersonController extends Controller
      * )
      */
 
-    public function index()
+    public function index(Request $request)
     {
-        //REVISAR LO DE LA PAGINACIÓN
-        return response()->json(Person::where('id', '!=', 1)->simplePaginate(100));
+        $user = Auth::user();
+        $typeUser = $user->typeUser;
 
+        $accesses = $typeUser->getAccess($typeUser->id);
+
+        $currentRoute = $request->path();
+        $currentRouteParts = explode('/', $currentRoute);
+        $lastPart = end($currentRouteParts);
+
+        if (in_array($lastPart, $accesses)) {
+            $groupMenu = GroupMenu::getFilteredGroupMenusSuperior($user->typeofUser_id);
+            $groupMenuLeft = GroupMenu::getFilteredGroupMenus($user->typeofUser_id);
+
+            return view('Modulos.Student.index', compact('user', 'groupMenu', 'groupMenuLeft'));
+        } else {
+            abort(403, 'Acceso no autorizado.');
+        }
+    }
+
+    public function all(Request $request)
+    {
+        $draw = $request->get('draw');
+        $start = $request->get('start', 0);
+        $length = $request->get('length', 15);
+        $filters = $request->input('filters', []);
+
+        $query = Person::where('state', 1)
+            ->orderBy('id', 'desc');
+
+        // Aplicar filtros por columna
+        foreach ($request->get('columns') as $column) {
+            if ($column['searchable'] == 'true' && !empty($column['search']['value'])) {
+                $searchValue = trim($column['search']['value'], '()'); // Quitar paréntesis adicionales
+
+                switch ($column['data']) {
+                    case 'documentNumber':
+                        $query->where(function ($q) use ($searchValue) {
+                            $q->where('names', 'like', '%' . $searchValue . '%')
+                                ->orWhere('fatherSurname', 'like', '%' . $searchValue . '%')
+                                ->orWhere('motherSurname', 'like', '%' . $searchValue . '%')
+                                ->orWhere('documentNumber', 'like', '%' . $searchValue . '%')
+                                ->orWhere('identityNumber', 'like', '%' . $searchValue . '%');
+                        });
+                        break;
+                    case 'id':
+                        $query->where('id', 'like', '%' . $searchValue . '%');
+                        break;
+                    case 'level':
+                        $query->where('level', 'like', '%' . $searchValue . '%');
+                        break;
+                    case 'grade':
+                        $query->where('grade', 'like', '%' . $searchValue . '%');
+                        break;
+                    case 'section':
+                        $query->where('section', 'like', '%' . $searchValue . '%');
+                        break;
+                    case 'representativeDni':
+                        $query->where(function ($q) use ($searchValue) {
+                            $q->where('representativeNames', 'like', '%' . $searchValue . '%')
+                                ->orWhere('representativeDni', 'like', '%' . $searchValue . '%');
+                        });
+                        break;
+                    case 'telephone':
+                        $query->where('telephone', 'like', '%' . $searchValue . '%');
+                        break;
+                }
+            }
+        }
+
+        $totalRecords = $query->count();
+
+        $list = $query->skip($start)
+            ->take($length)
+            ->get();
+
+        return response()->json([
+            'draw' => $draw,
+            'recordsTotal' => $totalRecords,
+            'recordsFiltered' => $totalRecords,
+            'data' => $list,
+        ]);
     }
 
     /**
@@ -256,54 +341,40 @@ class PersonController extends Controller
      */
     public function update(Request $request, string $id)
     {
-
         $object = Person::find($id);
 
         if (!$object) {
-            return response()->json(
-                ['message' => 'User not found'], 404
-            );
+            return response()->json(['message' => 'Person not found'], 404);
         }
+
         $validator = validator()->make($request->all(), [
-            'typeofDocument' => 'required',
             'documentNumber' => [
                 'required',
-                Rule::unique('people')->ignore($id)->whereNull('deleted_at'),
+                Rule::unique('people')->ignore($object->id)->whereNull('deleted_at'),
             ],
+            // Agrega aquí las reglas de validación para los demás campos que desees actualizar
         ]);
 
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()->first()], 422);
         }
 
-        $data = [
-            'typeofDocument' => $request->input('typeofDocument'),
-            'documentNumber' => $request->input('documentNumber'),
-            'address' => $request->input('address') ?? null,
-            'phone' => $request->input('phone') ?? null,
-            'email' => $request->input('email') ?? null,
-            'origin' => $request->input('origin') ?? null,
-            'ocupation' => $request->input('ocupation') ?? null,
-        ];
+        $object->documentNumber = $request->input('documentNumber');
 
-        if ($request->input('typeofDocument') == 'DNI') {
-            $data['names'] = $request->input('names') ?? null;
-            $data['fatherSurname'] = $request->input('fatherSurname') ?? null;
-            $data['motherSurname'] = $request->input('motherSurname') ?? null;
-            $data['businessName'] = null;
-            $data['representativeDni'] = null;
-            $data['representativeNames'] = null;
-        } elseif ($request->input('typeofDocument') == 'RUC') {
-            $data['names'] = null;
-            $data['fatherSurname'] = null;
-            $data['motherSurname'] = null;
-            $data['businessName'] = $request->input('businessName') ?? null;
-            $data['representativeDni'] = $request->input('representativeDni') ?? null;
-            $data['representativeNames'] = $request->input('representativeNames') ?? null;
-        }
+        $object->names = $request->input('names');
+        $object->fatherSurname = $request->input('fatherSurname');
+        $object->motherSurname = $request->input('motherSurname');
+        $object->businessName = $request->input('businessName');
+        $object->level = $request->input('level');
+        $object->grade = $request->input('grade');
+        $object->section = $request->input('section');
+        $object->representativeDni = $request->input('representativeDni');
+        $object->representativeNames = $request->input('representativeNames');
+        $object->telephone = $request->input('telephone');
 
-        $object->update($data);
+        $object->save();
         $object = Person::find($object->id);
+
         return response()->json($object, 200);
     }
 

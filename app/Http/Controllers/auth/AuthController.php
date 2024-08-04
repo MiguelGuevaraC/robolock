@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
-
 class AuthController extends Controller
 {
     public function login(Request $request)
@@ -21,8 +20,6 @@ class AuthController extends Controller
             'username' => 'required',
             'password' => 'required',
         ]);
-
-        // Verificar si las credenciales son válidas
         if ($validator->fails()) {
             return response()->json(['error' => 'Credenciales inválidas'], 400);
         }
@@ -34,17 +31,13 @@ class AuthController extends Controller
         }
 
         if (Hash::check($request->password, $user->password)) {
-            // Autenticar al usuario
             Auth::loginUsingId($user->id);
-
             $token = $user->createToken('auth_token')->plainTextToken;
             $user = User::with(['typeUser'])->find($user->id);
-
             $typeUser = $user->typeUser;
-
             $groupMenu = GroupMenu::getFilteredGroupMenus($typeUser->id);
+            $token = $user->createToken('Token Name')->plainTextToken;
 
-            // Redirigir al usuario a la vista de inicio
             return redirect()->route('vistaInicio')->with('token', $token);
         } else {
             return view('auth.login');

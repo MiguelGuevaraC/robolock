@@ -4,7 +4,9 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
+use App\Models\AccessLog;
 use App\Models\Person;
+use App\Models\Photo;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -25,16 +27,10 @@ class DatabaseSeeder extends Seeder
                 'names' => 'Administrador',
                 'fatherSurname' => '-',
                 'motherSurname' => '-',
-                'businessName' => null,
-                'level' => null,
-                'grade' => null,
-                'section' => null,
-                'representativeDni' => null,
-                'representativeNames' => null,
+   
                 'telephone' => '903017426',
                 'email' => 'guevaracajusolmiguel@gmail.com',
-                'origin' => 'Chiclayo',
-                'ocupation' => 'Administrador',
+        
             ],
             [
                 'id' => '2',
@@ -43,16 +39,10 @@ class DatabaseSeeder extends Seeder
                 'names' => 'VARIOS',
                 'fatherSurname' => '-',
                 'motherSurname' => '-',
-                'businessName' => null,
-                'level' => null,
-                'grade' => null,
-                'section' => null,
-                'representativeDni' => null,
-                'representativeNames' => null,
+               
                 'telephone' => '903017426',
                 'email' => 'johndoe@gmail.com',
-                'origin' => 'Lambayeque',
-                'ocupation' => 'VARIOS',
+           
             ],
             [
                 'id' => '3',
@@ -61,16 +51,10 @@ class DatabaseSeeder extends Seeder
                 'names' => 'Administrador',
                 'fatherSurname' => '-',
                 'motherSurname' => '-',
-                'businessName' => null,
-                'level' => null,
-                'grade' => null,
-                'section' => null,
-                'representativeDni' => null,
-                'representativeNames' => null,
+              
                 'telephone' => '903017426',
                 'email' => 'guevaracajusolmiguel@gmail.com',
-                'origin' => 'Chiclayo',
-                'ocupation' => 'Usuario',
+       
             ],
             [
                 'id' => '4',
@@ -79,16 +63,10 @@ class DatabaseSeeder extends Seeder
                 'names' => 'Miguel Angel',
                 'fatherSurname' => 'Guevara',
                 'motherSurname' => 'Cajusol',
-                'businessName' => null,
-                'level' => null,
-                'grade' => null,
-                'section' => null,
-                'representativeDni' => null,
-                'representativeNames' => null,
+             
                 'telephone' => '903017426',
                 'email' => 'johndo@gmail.com',
-                'origin' => 'Lambayeque',
-                'ocupation' => 'Administrador',
+ 
             ], [
                 'id' => '5',
                 'typeofDocument' => 'DNI',
@@ -96,16 +74,10 @@ class DatabaseSeeder extends Seeder
                 'names' => 'Estudiante',
                 'fatherSurname' => 'Padre',
                 'motherSurname' => 'Madre',
-                'businessName' => null,
-                'level' => 'Secundaria',
-                'grade' => '3ro',
-                'section' => 'A',
-                'representativeDni' => '33333333',
-                'representativeNames' => 'Padre de Estudiante',
+                
                 'telephone' => '987654321',
                 'email' => 'padredeestudiante@gmail.com',
-                'origin' => 'Lima',
-                'ocupation' => 'Estudiante',
+      
             ],
         ];
 
@@ -116,6 +88,13 @@ class DatabaseSeeder extends Seeder
             } else {
                 Person::create($object);
             }
+        }
+
+        $people = Person::factory(3)->create();
+
+        foreach ($people as $person) {
+            Photo::factory(3)->create(['authorized_person_id' => $person->id]);
+            AccessLog::factory(5)->create(['authorized_person_id' => $person->id]);
         }
 
         $this->call(GroupMenuSeeder::class);

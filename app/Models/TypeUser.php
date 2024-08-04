@@ -23,6 +23,7 @@ class TypeUser extends Model
 
     protected $fillable = [
         'name',
+        'state',
     ];
 
     protected $hidden = [
@@ -67,8 +68,13 @@ class TypeUser extends Model
 
     public function getAccess($id)
     {
-        $accesses = Access::where('typeuser_id', $id)->pluck('optionmenu_id')->toArray();
-        return ($accesses);
+        $accesses = Access::with('optionMenu')
+                        ->where('typeuser_id', $id)
+                        ->get()
+                        ->pluck('optionMenu.route')
+                        ->toArray();
+        
+        return $accesses;
     }
 
 }

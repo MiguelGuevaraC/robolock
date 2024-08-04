@@ -49,7 +49,7 @@ class User extends Authenticatable
     protected $fillable = [
         'id',
         'username',
-
+        'password',
         'created_at',
         'worker_id',
         'typeofUser_id',
@@ -69,6 +69,11 @@ class User extends Authenticatable
     public function person()
     {
         return $this->belongsTo(Person::class, 'person_id');
+    }
+
+    public function students()
+    {
+        return $this->hasMany(Person::class);
     }
 
 }

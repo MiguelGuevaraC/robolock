@@ -2,9 +2,9 @@
     function namesPerson($person)
     {
         $nombre = '';
-        if ($person->typeofDocument == 'DNI') {
+        if ($person->typeofDocument != 'RUC') {
             $nombre = $person->names . ' ' . $person->fatherSurname . ' ' . $person->motherSurname;
-        } elseif ($person->typeofDocument == 'RUC') {
+        } else {
             $nombre = $person->businessName;
         }
         return $nombre;
@@ -28,7 +28,7 @@
     
     ?>
 
-    <title>RoboLock | {{ $vista }}</title>
+    <title>Robolock | {{ $vista }}</title>
     <link type="image/png" href="plantillaNuevo\img\logo.png" rel="icon">
 
 
@@ -124,7 +124,7 @@
                     <a href='vistaInicio' class="navbar-brand">
                         {{-- <img src="plantillaNuevo\img\logo.png" alt="Nifty Logo" class="brand-icon"> --}}
                         <div class="brand-title">
-                            <span class="brand-text">RoboLock</span>
+                            <span class="brand-text">Robolock</span>
                         </div>
                     </a>
                 </div>
@@ -150,29 +150,28 @@
                     </ul>
                     <ul class="nav navbar-top-links">
                         <?php foreach ($groupMenu as $item): ?>
-                            
-                                @foreach ($item['option_menus'] as $menu)
-                                    
-                                        <li id="dropdown-<?php echo $item['id']; ?>" class="dropdown">
-                                            <a href="{{ $menu['route'] }}" data-tooltip="{{ $menu['name'] }}"
-                                                class="btn-profesional dropdown-toggle text-right">
-                                                <span class="ic-user pull-right">
-                                                    <i style="font-size:21px" class="{{ $menu['icon'] }}"></i>
-                                                </span>
-                                            </a>
-                                        </li>
-                                  
-                                @endforeach
-                          
+
+                        @foreach ($item['option_menus'] as $menu)
+                            <li id="dropdown-<?php echo $item['id']; ?>" class="dropdown">
+                                <a href="{{ $menu['route'] }}" data-tooltip="{{ $menu['name'] }}"
+                                    class="btn-profesional dropdown-toggle text-right">
+                                    <span class="ic-user pull-right">
+                                        <i style="font-size:21px" class="{{ $menu['icon'] }}"></i>
+                                    </span>
+                                </a>
+                            </li>
+                        @endforeach
+
                         <?php endforeach; ?>
-                    
+
                         <li id="dropdown-user" class="dropdown">
-                            <a href="#" data-tooltip="Perfil" data-toggle="dropdown" class="btn-profesional dropdown-toggle text-right">
+                            <a href="#" data-tooltip="Perfil" data-toggle="dropdown"
+                                class="btn-profesional dropdown-toggle text-right">
                                 <span class="ic-user pull-right">
                                     <i style="font-size:21px" class="fa-solid fa-user"></i>
                                 </span>
                             </a>
-                    
+
                             <div class="dropdown-menu dropdown-menu-sm dropdown-menu-right panel-default">
                                 <ul class="head-list">
                                     <li>
@@ -185,7 +184,7 @@
                             </div>
                         </li>
                     </ul>
-                    
+
 
 
                 </div>
@@ -207,11 +206,13 @@
                     <!--Page Title-->
                     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
                     <div class="pad-all text-center">
-                        <h3>Hola Soy RoboLock</h3>
-                         <hr class="my-4"><p>Desde esta exclusiva plataforma, podrás gestionar los usuarios que tendrán acceso autorizado.
+                        <h3>Bienvenido a Robolock por WhatsApp</h3>
+                        <hr class="my-4">
+                        <p>Descubre nuestra exclusiva plataforma para enviar mensajes por whatsaApp. Puedes cargar los
+                            datos de los estudiantes y enviar notificaciones a los padres sobre los pagos pendientes.
                         </p>
-                       
-                        <p>Fusionando la <b>Inteligencia Artificial</b> con la <b>Robótica</b>, mejoraremos el mundo y la seguridad.</p>
+
+                        <p>De la mano de <b>MrSoft</b>, solucionando juntos. Agradecemos su elección y confianza. !</p>
                     </div>
                     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
                     <!--End page title-->
@@ -273,7 +274,7 @@
                                         style="display:none">
                                 </a>
 
-                        
+
 
                                 <a href="#">
                                     <img alt="In the jungle" src="plantillaNuevo\img\gallery\thumbs\tile7.jpeg"
@@ -293,7 +294,7 @@
                                         data-description="This is a motorcycle" style="display:none">
                                 </a>
 
-                            
+
 
                                 <a href="#">
                                     <img alt="The winding road" src="plantillaNuevo\img\gallery\thumbs\tile6.jpeg"
@@ -315,16 +316,16 @@
                                         data-description="Those are yellow flowers" style="display:none">
                                 </a>
 
-                        
 
-          
+
+
                                 <a href="#">
                                     <img alt="Note" src="plantillaNuevo\img\gallery\thumbs\tile10.jpeg"
                                         data-image="plantillaNuevo\img/gallery/thumbs/tile10.jpeg"
                                         data-description="This is a note" style="display:none">
                                 </a>
 
-                   
+
                             </div>
                         </div>
                     </div>
@@ -395,28 +396,28 @@
 
                                 <ul id="mainnav-menu" class="list-group">
                                     <?php foreach ($groupMenuLeft as $categoria): ?>
-                                        <?php if (!empty($categoria['option_menus']) && count($categoria['option_menus']) > 0): ?>
-                                            <li class="<?= $categoria['nombre'] == $categoriaActual ? 'active-sub' : '' ?>">
-                                                <a href="#">
-                                                    <i class="<?= $categoria['icon'] ?>"></i>
-                                                    <span class="menu-title"><?= strtoupper($categoria['name']) ?></span>
-                                                    <i class="arrow"></i>
+                                    <?php if (!empty($categoria['option_menus']) && count($categoria['option_menus']) > 0): ?>
+                                    <li class="<?= $categoria['nombre'] == $categoriaActual ? 'active-sub' : '' ?>">
+                                        <a href="#">
+                                            <i class="<?= $categoria['icon'] ?>"></i>
+                                            <span class="menu-title"><?= strtoupper($categoria['name']) ?></span>
+                                            <i class="arrow"></i>
+                                        </a>
+                                        <ul class="<?= $categoria['name'] == $categoriaActual ? 'collapse in' : '' ?>">
+                                            <?php foreach ($categoria['option_menus'] as $item): ?>
+                                            <li class="<?= $item['route'] == $OpcionActual ? 'active-link' : '' ?>">
+                                                <a class="optionsMenu" href="<?= $item['route'] ?>">
+                                                    <i class="<?= $item['icon'] ?>"></i> <?= $item['name'] ?>
                                                 </a>
-                                                <ul class="<?= $categoria['name'] == $categoriaActual ? 'collapse in' : '' ?>">
-                                                    <?php foreach ($categoria['option_menus'] as $item): ?>
-                                                        <li class="<?= $item['route'] == $OpcionActual ? 'active-link' : '' ?>">
-                                                            <a class="optionsMenu" href="<?= $item['route'] ?>">
-                                                                <i class="<?= $item['icon'] ?>"></i> <?= $item['name'] ?>
-                                                            </a>
-                                                        </li>
-                                                    <?php endforeach; ?>
-                                                </ul>
                                             </li>
-                                        <?php endif; ?>
+                                            <?php endforeach; ?>
+                                        </ul>
+                                    </li>
+                                    <?php endif; ?>
                                     <?php endforeach; ?>
                                 </ul>
-                                
-                                
+
+
 
 
 
@@ -514,13 +515,13 @@
 
     <!--Custom script [ DEMONSTRATION ]-->
     <!--===================================================-->
-  
+
     <script src="{{ asset('js/app.js') }}"></script>
     <script src="{{ asset('js/JqueryInicio/JqueryInicio.js') }}"></script>
     <script src="/robolock/Cdn-Locales/pkgAwsome/js/all.js"></script>
- 
 
-  <script>
+
+    <script>
         $(document).on('nifty.ready', function() {
 
 
