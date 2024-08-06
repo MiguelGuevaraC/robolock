@@ -252,6 +252,9 @@ class PersonController extends Controller
                 ]);
             }
         }
+
+        $absoluteDirectoryPath = storage_path('app/public/photos/' . $person->id);
+    $this->recursiveChmod($absoluteDirectoryPath, 0777);
         $person = Person::find($person->id);
 
         // Devolver la respuesta con el objeto creado
