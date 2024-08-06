@@ -100,17 +100,11 @@ function stopCamera() {
     captureBtn.style.display = "none";
 }
 
-// Enumerar dispositivos de vídeo y configurar el selector de cámara
-// Primero, revisamos los dispositivos disponibles
 navigator.mediaDevices.enumerateDevices()
     .then((devices) => {
-        // Filtramos solo los dispositivos de tipo "videoinput"
         const videoDevices = devices.filter((device) => device.kind === "videoinput");
-        
-        // Obtenemos la referencia al elemento <select> donde se listarán las cámaras
         const cameraSelect = document.getElementById('cameraSelect');
-        
-        // Limpiamos el contenido actual del <select>
+
         cameraSelect.innerHTML = '';
 
         // Iteramos sobre los dispositivos de video y los agregamos como opciones al <select>
@@ -120,11 +114,12 @@ navigator.mediaDevices.enumerateDevices()
             option.text = `Cámara ${index + 1} (${device.label || 'Desconocida'})`;
             cameraSelect.appendChild(option);
         });
-        
+
         // Agregamos un evento para manejar la selección de la cámara
         cameraSelect.addEventListener('change', function () {
-            if (cameraSelect.value) {
-                startCamera();  // Función para iniciar la cámara
+            const selectedDeviceId = cameraSelect.value;
+            if (selectedDeviceId) {
+                startCamera(selectedDeviceId);  // Pasar el deviceId a la función para iniciar la cámara
             } else {
                 stopCamera();   // Función para detener la cámara
             }
@@ -133,6 +128,7 @@ navigator.mediaDevices.enumerateDevices()
     .catch((error) => {
         console.error("Error al enumerar los dispositivos:", error);
     });
+
 
 
 // Encender y apagar la cámara según el estado del modal
