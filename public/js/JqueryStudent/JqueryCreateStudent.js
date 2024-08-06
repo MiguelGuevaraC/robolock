@@ -100,34 +100,36 @@ function stopCamera() {
     captureBtn.style.display = "none";
 }
 
-navigator.mediaDevices.enumerateDevices()
-    .then((devices) => {
-        const videoDevices = devices.filter((device) => device.kind === "videoinput");
-        const cameraSelect = document.getElementById('cameraSelect');
+if (navigator.mediaDevices && typeof navigator.mediaDevices.enumerateDevices === 'function') {
+    navigator.mediaDevices.enumerateDevices()
+        .then((devices) => {
+            const videoDevices = devices.filter((device) => device.kind === "videoinput");
+            const cameraSelect = document.getElementById('cameraSelect');
 
-        cameraSelect.innerHTML = '';
+            cameraSelect.innerHTML = '';
 
-        // Iteramos sobre los dispositivos de video y los agregamos como opciones al <select>
-        videoDevices.forEach((device, index) => {
-            const option = document.createElement('option');
-            option.value = device.deviceId;
-            option.text = `Cámara ${index + 1} (${device.label || 'Desconocida'})`;
-            cameraSelect.appendChild(option);
+            videoDevices.forEach((device, index) => {
+                const option = document.createElement('option');
+                option.value = device.deviceId;
+                option.text = `Cámara ${index + 1} (${device.label || 'Desconocida'})`;
+                cameraSelect.appendChild(option);
+            });
+
+            cameraSelect.addEventListener('change', function () {
+                const selectedDeviceId = cameraSelect.value;
+                if (selectedDeviceId) {
+                    startCamera(selectedDeviceId);  // Pasar el deviceId a la función para iniciar la cámara
+                } else {
+                    stopCamera();   // Función para detener la cámara
+                }
+            });
+        })
+        .catch((error) => {
+            console.error("Error al enumerar los dispositivos:", error);
         });
-
-        // Agregamos un evento para manejar la selección de la cámara
-        cameraSelect.addEventListener('change', function () {
-            const selectedDeviceId = cameraSelect.value;
-            if (selectedDeviceId) {
-                startCamera(selectedDeviceId);  // Pasar el deviceId a la función para iniciar la cámara
-            } else {
-                stopCamera();   // Función para detener la cámara
-            }
-        });
-    })
-    .catch((error) => {
-        console.error("Error al enumerar los dispositivos:", error);
-    });
+} else {
+    console.error("La API de MediaDevices no está disponible.");
+}
 
 
 

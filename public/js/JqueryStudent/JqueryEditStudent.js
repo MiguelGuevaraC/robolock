@@ -144,32 +144,37 @@ function stopCameraE() {
 }
 
 // Enumerar dispositivos de vídeo y configurar el selector de cámara
-navigator.mediaDevices.enumerateDevices()
-    .then((devices) => {
-        const videoDevices = devices.filter((device) => device.kind === "videoinput");
-        const cameraSelectE = document.getElementById('cameraSelectE');  // Asegúrate de que el ID es correcto
+if (navigator.mediaDevices && typeof navigator.mediaDevices.enumerateDevices === 'function') {
+    navigator.mediaDevices.enumerateDevices()
+        .then((devices) => {
+            const videoDevices = devices.filter((device) => device.kind === "videoinput");
+            const cameraSelectE = document.getElementById('cameraSelectE');
 
-        cameraSelectE.innerHTML = '';  // Limpiamos las opciones previas
+            cameraSelectE.innerHTML = '';
 
-        videoDevices.forEach((device, index) => {
-            const option = document.createElement("option");
-            option.value = device.deviceId;
-            option.text = device.label || `Cámara ${index + 1}`;
-            cameraSelectE.appendChild(option);
+            videoDevices.forEach((device, index) => {
+                const option = document.createElement("option");
+                option.value = device.deviceId;
+                option.text = device.label || `Cámara ${index + 1}`;
+                cameraSelectE.appendChild(option);
+            });
+
+            cameraSelectE.addEventListener("change", function () {
+                const selectedDeviceId = cameraSelectE.value;
+                if (selectedDeviceId) {
+                    startCameraE(selectedDeviceId);  // Pasar el deviceId a la función para iniciar la cámara
+                } else {
+                    stopCameraE();  // Función para detener la cámara
+                }
+            });
+        })
+        .catch((error) => {
+            console.error("Error al enumerar los dispositivos:", error);
         });
+} else {
+    console.error("La API de MediaDevices no está disponible.");
+}
 
-        cameraSelectE.addEventListener("change", function () {
-            const selectedDeviceId = cameraSelectE.value;
-            if (selectedDeviceId) {
-                startCameraE(selectedDeviceId);  // Pasar el deviceId a la función para iniciar la cámara
-            } else {
-                stopCameraE();  // Función para detener la cámara
-            }
-        });
-    })
-    .catch((error) => {
-        console.error("Error al enumerar los dispositivos:", error);
-    });
 
 
 // Función para actualizar las fotos capturadas
