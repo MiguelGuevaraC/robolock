@@ -108,7 +108,7 @@ if (navigator.mediaDevices && typeof navigator.mediaDevices.enumerateDevices ===
             console.log("Dispositivos encontrados:", devices);
             
             const videoDevices = devices.filter((device) => device.kind === "videoinput");
-            console.log("Dispositivos de video:", videoDevices);
+            console.log("Dispositivos de video encontrados:", videoDevices);
             
             const cameraSelect = document.getElementById('cameraSelect');
             if (!cameraSelect) {
@@ -141,6 +141,7 @@ if (navigator.mediaDevices && typeof navigator.mediaDevices.enumerateDevices ===
 } else {
     console.log("La API de MediaDevices no está disponible.");
 }
+
 
 
 
