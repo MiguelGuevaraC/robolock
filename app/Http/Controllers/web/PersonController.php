@@ -475,11 +475,20 @@ class PersonController extends Controller
             foreach ($request->file('photosEd') as $file) {
                 $filename = time() . '_' . $file->getClientOriginalName();
                 $filePath = $file->storeAs('public/photos/' . $person->id, $filename);
-                $absoluteFilePath = storage_path('app/' . $filePath);
+    
+                // Asegúrate de que el directorio tenga permisos adecuados
+                $directoryPath = storage_path('app/public/photos/' . $person->id);
+                if (!is_dir($directoryPath)) {
+                    mkdir($directoryPath, 0777, true); // Crear directorio con permisos 0777
+                }
+    
+                // Asegúrate de que el archivo tenga permisos adecuados
+                $absoluteFilePath = storage_path('/app/public/photos/' . $person->id . '/' . $filename);
                 chmod($absoluteFilePath, 0777);
+    
                 Photo::create([
                     'person_id' => $person->id,
-                    'photoPath' => Storage::url('app/public/photos/' . $person->id . '/' . $filename),
+                    'photoPath' => Storage::url('/app/public/photos/' . $person->id . '/' . $filename),
                     'status' => 'Activo',
                 ]);
             }
