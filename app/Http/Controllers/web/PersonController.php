@@ -5,8 +5,10 @@ namespace App\Http\Controllers\web;
 use App\Http\Controllers\Controller;
 use App\Models\GroupMenu;
 use App\Models\Person;
+use App\Models\Photo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class PersonController extends Controller
@@ -77,54 +79,44 @@ class PersonController extends Controller
 
         // Aplicar filtros por columna
         foreach ($request->get('columns') as $column) {
-            if ($column['searchable'] == 'true' && !empty($column['search']['value'])) {
+            if ($column['searchable'] === 'true' && !empty($column['search']['value'])) {
                 $searchValue = trim($column['search']['value'], '()'); // Quitar paréntesis adicionales
 
                 switch ($column['data']) {
                     case 'documentNumber':
                         $query->where(function ($q) use ($searchValue) {
                             $q->where('names', 'like', '%' . $searchValue . '%')
+                                ->orWhere('names', 'like', '%' . $searchValue . '%')
                                 ->orWhere('fatherSurname', 'like', '%' . $searchValue . '%')
                                 ->orWhere('motherSurname', 'like', '%' . $searchValue . '%')
                                 ->orWhere('documentNumber', 'like', '%' . $searchValue . '%')
-                                ->orWhere('identityNumber', 'like', '%' . $searchValue . '%');
+                                ->orWhere('uid', 'like', '%' . $searchValue . '%');
                         });
                         break;
                     case 'id':
                         $query->where('id', 'like', '%' . $searchValue . '%');
                         break;
-                    case 'level':
-                        $query->where('level', 'like', '%' . $searchValue . '%');
+                    case 'dateBirth':
+                        $query->where('dateBirth', 'like', '%' . $searchValue . '%');
                         break;
-                    case 'grade':
-                        $query->where('grade', 'like', '%' . $searchValue . '%');
+                    case 'email':
+                        $query->where('email', 'like', '%' . $searchValue . '%');
                         break;
-                    case 'section':
-                        $query->where('section', 'like', '%' . $searchValue . '%');
-                        break;
-                    case 'representativeDni':
-                        $query->where(function ($q) use ($searchValue) {
-                            $q->where('representativeNames', 'like', '%' . $searchValue . '%')
-                                ->orWhere('representativeDni', 'like', '%' . $searchValue . '%');
-                        });
-                        break;
-                    case 'telephone':
-                        $query->where('telephone', 'like', '%' . $searchValue . '%');
-                        break;
+
                 }
             }
         }
 
-        $totalRecords = $query->count();
+        $totalRecordsFiltered = $query->count();
 
         $list = $query->skip($start)
             ->take($length)
-            ->get();
+         ->get();
 
         return response()->json([
             'draw' => $draw,
-            'recordsTotal' => $totalRecords,
-            'recordsFiltered' => $totalRecords,
+            'recordsTotal' => Person::where('state', 1)->count(),
+            'recordsFiltered' => $totalRecordsFiltered,
             'data' => $list,
         ]);
     }
@@ -179,48 +171,91 @@ class PersonController extends Controller
     public function store(Request $request)
     {
 
+        // Validación de los campos
+        $messages = [
+            'documentNumber.required' => 'El número de documento es obligatorio.',
+            'documentNumber.string' => 'El número de documento debe ser una cadena de caracteres.',
+            'documentNumber.unique' => 'El número de documento ya existe.',
+            'names.required' => 'El nombre es obligatorio.',
+            'names.string' => 'El nombre debe ser una cadena de caracteres.',
+            'names.max' => 'El nombre no puede tener más de 255 caracteres.',
+            'fatherSurname.required' => 'El apellido paterno es obligatorio.',
+            'fatherSurname.string' => 'El apellido paterno debe ser una cadena de caracteres.',
+            'fatherSurname.max' => 'El apellido paterno no puede tener más de 255 caracteres.',
+            'motherSurname.required' => 'El apellido materno es obligatorio.',
+            'motherSurname.string' => 'El apellido materno debe ser una cadena de caracteres.',
+            'motherSurname.max' => 'El apellido materno no puede tener más de 255 caracteres.',
+            'UID.required' => 'El UID es obligatorio.',
+            'UID.string' => 'El UID debe ser una cadena de caracteres.',
+            'UID.max' => 'El UID no puede tener más de 255 caracteres.',
+            'photos.*.image' => 'Cada foto debe ser una imagen.',
+            'photos.*.mimes' => 'Cada foto debe estar en formato jpg, jpeg o png.',
+            'photos.*.max' => 'Cada foto no puede superar los 2048 KB.',
+            'email.string' => 'El correo electrónico debe ser una cadena de caracteres.',
+            'email.email' => 'El correo electrónico debe ser una dirección de correo válida.',
+            'email.max' => 'El correo electrónico no puede tener más de 255 caracteres.',
+            'telefono.string' => 'El teléfono debe ser una cadena de caracteres.',
+            'telefono.regex' => 'El teléfono debe contener exactamente 9 dígitos.',
+        ];
+
         $validator = validator()->make($request->all(), [
-            'typeofDocument' => 'required',
             'documentNumber' => [
                 'required',
+                'string',
                 Rule::unique('people')->whereNull('deleted_at'),
             ],
-        ]);
+            'names' => 'required|string|max:255',
+            'fatherSurname' => 'required|string|max:255',
+            'motherSurname' => 'required|string|max:255',
+            'UID' => 'required|string|max:255',
+            'photos.*' => 'image|mimes:jpg,jpeg,png|max:2048', // Validación de las fotos
+            'email' => 'nullable|string|email|max:255',
+            'telefono' => [
+                'nullable',
+                'string',
+                'regex:/^\d{9}$/',
+            ],
+        ], $messages);
 
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()->first()], 422);
         }
 
+        // Datos de la persona
         $data = [
-            'typeofDocument' => $request->input('typeofDocument'),
+            'typeofDocument' => 'DNI',
             'documentNumber' => $request->input('documentNumber'),
-            'address' => $request->input('address') ?? null,
-            'phone' => $request->input('phone') ?? null,
-            'email' => $request->input('email') ?? null,
-            'origin' => $request->input('origin') ?? null,
-            'ocupation' => $request->input('ocupation') ?? null,
-            'names' => null,
-            'fatherSurname' => null,
-            'motherSurname' => null,
-            'businessName' => null,
-            'representativeDni' => null,
-            'representativeNames' => null,
+            'names' => $request->input('names'),
+            'fatherSurname' => $request->input('fatherSurname'),
+            'motherSurname' => $request->input('motherSurname'),
+            'uid' => $request->input('UID'),
+            'status' => 'Activo',
+            'email' => $request->input('email'),
+            'telephone' => $request->input('telefono'),
+            'dateBirth' => $request->input('dateOfBirth'),
         ];
 
-        if ($request->input('typeofDocument') == 'DNI') {
-            $data['names'] = $request->input('names') ?? null;
-            $data['fatherSurname'] = $request->input('fatherSurname') ?? null;
-            $data['motherSurname'] = $request->input('motherSurname') ?? null;
-        } elseif ($request->input('typeofDocument') == 'RUC') {
-            $data['businessName'] = $request->input('businessName') ?? null;
-            $data['representativeDni'] = $request->input('representativeDni') ?? null;
-            $data['representativeNames'] = $request->input('representativeNames') ?? null;
+        // Creación del objeto Person
+        $person = Person::create($data);
+
+        // Manejo de las fotos
+        if ($request->hasFile('photos')) {
+            foreach ($request->file('photos') as $file) {
+
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $filePath = $file->storeAs('public/photos/' . $person->id, $filename);
+
+                Photo::create([
+                    'person_id' => $person->id,
+                    'photoPath' => Storage::url('app/public/photos/' . $person->id . '/' . $filename),
+                    'status' => 'Activo',
+                ]);
+            }
         }
+        $person = Person::find($person->id);
 
-        $object = Person::create($data);
-        $object = Person::find($object->id);
-        return response()->json($object, 200);
-
+        // Devolver la respuesta con el objeto creado
+        return response()->json($person, 200);
     }
 
     /**
@@ -271,10 +306,12 @@ class PersonController extends Controller
     public function show(int $id)
     {
 
-        $object = Person::find($id);
+        $object = Person::with(['photos', 'accessLogs'])->find($id);
         if ($object) {
+
             return response()->json($object, 200);
         }
+
         return response()->json(
             ['message' => 'Person not found'], 404
         );
@@ -339,43 +376,116 @@ class PersonController extends Controller
      * )
      *
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        $object = Person::find($id);
 
-        if (!$object) {
-            return response()->json(['message' => 'Person not found'], 404);
-        }
+        // Validación de los campos
+        $messages = [
+            'documentNumber.string' => 'El número de documento debe ser una cadena de caracteres.',
+            'documentNumber.required' => 'El número de documento es obligatorio.',
+            'documentNumber.unique' => 'El número de documento ya existe.',
+            'namesE.required' => 'El nombre es obligatorio.',
+            'namesE.string' => 'El nombre debe ser una cadena de caracteres.',
+            'namesE.max' => 'El nombre no puede tener más de 255 caracteres.',
+            'fatherSurnameE.required' => 'El apellido paterno es obligatorio.',
+            'fatherSurnameE.string' => 'El apellido paterno debe ser una cadena de caracteres.',
+            'fatherSurnameE.max' => 'El apellido paterno no puede tener más de 255 caracteres.',
+            'motherSurnameE.required' => 'El apellido materno es obligatorio.',
+            'motherSurnameE.string' => 'El apellido materno debe ser una cadena de caracteres.',
+            'motherSurnameE.max' => 'El apellido materno no puede tener más de 255 caracteres.',
+            'UIDE.required' => 'El UID es obligatorio.',
+            'UIDE.string' => 'El UID debe ser una cadena de caracteres.',
+            'UIDE.max' => 'El UID no puede tener más de 255 caracteres.',
+            'photosEd.*.image' => 'Cada foto debe ser una imagen.',
+            'photosEd.*.mimes' => 'Cada foto debe estar en formato jpg, jpeg o png.',
+            'photosEd.*.max' => 'Cada foto no puede superar los 2048 KB.',
+            'emailE.string' => 'El correo electrónico debe ser una cadena de caracteres.',
+            'emailE.email' => 'El correo electrónico debe ser una dirección de correo válida.',
+            'emailE.max' => 'El correo electrónico no puede tener más de 255 caracteres.',
+            'telefonoE.string' => 'El teléfono debe ser una cadena de caracteres.',
+            'telefonoE.regex' => 'El teléfono debe contener exactamente 9 dígitos.',
+        ];
 
         $validator = validator()->make($request->all(), [
             'documentNumber' => [
                 'required',
-                Rule::unique('people')->ignore($object->id)->whereNull('deleted_at'),
+                'string',
+                Rule::unique('people') // Nombre del campo en la base de datos
+                    ->ignore($id)
+                    ->whereNull('deleted_at'),
             ],
-            // Agrega aquí las reglas de validación para los demás campos que desees actualizar
-        ]);
+            'namesE' => 'required|string|max:255',
+            'fatherSurnameE' => 'required|string|max:255',
+            'motherSurnameE' => 'required|string|max:255',
+            'UIDE' => 'required|string|max:255',
+            'photosEd.*' => 'image|mimes:jpg,jpeg,png|max:2048',
+            'emailE' => 'nullable|string|email|max:255',
+            'telefonoE' => [
+                'nullable',
+                'string',
+                'regex:/^\d{9}$/',
+            ],
+        ], $messages);
 
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()->first()], 422);
         }
 
-        $object->documentNumber = $request->input('documentNumber');
+        // Encontrar la persona
+        $person = Person::find($id);
+        if (!$person) {
+            return response()->json(['error' => 'Persona no encontrada'], 404);
+        }
 
-        $object->names = $request->input('names');
-        $object->fatherSurname = $request->input('fatherSurname');
-        $object->motherSurname = $request->input('motherSurname');
-        $object->businessName = $request->input('businessName');
-        $object->level = $request->input('level');
-        $object->grade = $request->input('grade');
-        $object->section = $request->input('section');
-        $object->representativeDni = $request->input('representativeDni');
-        $object->representativeNames = $request->input('representativeNames');
-        $object->telephone = $request->input('telephone');
+        // Actualizar datos de la persona
+        $person->update([
+            'documentNumber' => $request->input('documentNumber'),
+            'names' => $request->input('namesE'),
+            'fatherSurname' => $request->input('fatherSurnameE'),
+            'motherSurname' => $request->input('motherSurnameE'),
+            'uid' => $request->input('UIDE'),
+            'status' => 'Activo',
+            'email' => $request->input('emailE'),
+            'telephone' => $request->input('telefonoE'),
+            'dateBirth' => $request->input('dateOfBirthE'), // Asumiendo que también necesitas agregar "E" aquí
+        ]);
 
-        $object->save();
-        $object = Person::find($object->id);
+        $oldPhotos = Photo::where('person_id', $person->id)->get();
+        // Eliminar fotos antiguas de la carpeta y de la base de datos
+        $directoryPath = 'public/photos/' . $person->id;
 
-        return response()->json($object, 200);
+        // Eliminar todas las fotos en el directorio
+        if (Storage::exists($directoryPath)) {
+            // Elimina todos los archivos en el directorio
+            $files = Storage::files($directoryPath);
+            foreach ($files as $file) {
+                Storage::delete($file);
+            }
+
+            // Elimina el directorio después de borrar los archivos
+            Storage::deleteDirectory($directoryPath);
+        }
+
+        // Elimina las entradas en la base de datos
+        foreach ($oldPhotos as $photo) {
+            $photo->delete();
+        }
+        // Manejo de las nuevas fotos
+        if ($request->hasFile('photosEd')) {
+            foreach ($request->file('photosEd') as $file) {
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $filePath = $file->storeAs('public/photos/' . $person->id, $filename);
+
+                Photo::create([
+                    'person_id' => $person->id,
+                    'photoPath' => Storage::url('app/public/photos/' . $person->id . '/' . $filename),
+                    'status' => 'Activo',
+                ]);
+            }
+        }
+
+        // Devolver la respuesta con el objeto actualizado
+        return response()->json($person, 200);
     }
 
     /**
@@ -439,7 +549,8 @@ class PersonController extends Controller
             );
         }
         //REVISAR ASOCIACIONES
-        $object->delete();
+        $object->state = 0;
+        $object->save();
     }
 
 }

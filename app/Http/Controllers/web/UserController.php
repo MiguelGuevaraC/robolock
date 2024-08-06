@@ -133,7 +133,7 @@ class UserController extends Controller
         ];
 
         $object = User::create($data);
-        $object = User::find($object->id);
+        $object = User::with(['typeUser', 'person'])->find($object->id);
         return response()->json($object, 200);
 
     }

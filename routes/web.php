@@ -1,12 +1,12 @@
 <?php
 
+use App\Http\Controllers\auth\AuthController;
+use App\Http\Controllers\InicioController;
 use App\Http\Controllers\web\GroupMenuController;
 use App\Http\Controllers\web\OptionMenuController;
 use App\Http\Controllers\web\PersonController;
 use App\Http\Controllers\web\TypeUserController;
 use App\Http\Controllers\web\UserController;
-use App\Http\Controllers\auth\AuthController;
-use App\Http\Controllers\InicioController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -72,13 +72,13 @@ Route::group(['middleware' => ['auth']], function () {
     Route::delete('access/{id}', [TypeUserController::class, 'destroy']);
     Route::post('access/setAccess', [TypeUserController::class, 'setAccess']);
 
-     //STUDENTS
-     Route::get('estudiante', [PersonController::class, 'index']);
-     Route::get('estudianteAll', [PersonController::class, 'all']);
-     Route::post('importExcel', [PersonController::class, 'importExcel']);
- 
-     Route::get('estudiante/{id}', [PersonController::class, 'show']);
-     Route::post('estudiante', [PersonController::class, 'store']);
-     Route::put('estudiante/{id}', [PersonController::class, 'update']);
-     Route::delete('estudiante/{id}', [PersonController::class, 'destroy']);
+    //STUDENTS
+    Route::get('estudiante', [PersonController::class, 'index']);
+    Route::get('estudianteAll', [PersonController::class, 'all']);
+    Route::post('importExcel', [PersonController::class, 'importExcel']);
+
+    Route::get('estudiante/{id}', [PersonController::class, 'show']);
+    Route::post('estudiante', [PersonController::class, 'store']);
+    Route::put('estudiante/{id}', [PersonController::class, 'update']);
+    Route::delete('estudiante/{id}', [PersonController::class, 'destroy']);
 });

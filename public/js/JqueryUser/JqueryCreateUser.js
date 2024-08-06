@@ -3,16 +3,32 @@ $(document).ready(function () {
 
     $("#registroUsuario").submit(function (event) {
         event.preventDefault(); // Evita que el formulario se envíe por el método tradicional
-
+    
+        // Validar campos en el cliente
+        var username = $("#username").val().trim();
+        var password = $("#pass").val().trim();
+        var typeofUser = $("#typeuser").val().trim();
+    
+        if (!username || !password || !typeofUser) {
+            $.niftyNoty({
+                type: "danger",
+                icon: "fa fa-times",
+                message: "Por favor, complete todos los campos.",
+                container: "floating",
+                timer: 4000,
+            });
+            return;
+        }
+    
         var token = $('meta[name="csrf-token"]').attr("content");
-
+    
         $.ajax({
-            url: "user",
+            url: "user", // Asegúrate de que esta URL sea segura y no sea susceptible a ataques XSS
             type: "POST",
             data: {
-                password: $("#pass").val(),
-                username: $("#username").val(),
-                typeofUser_id: $("#typeuser").val(),
+                password: password,
+                username: username,
+                typeofUser_id: typeofUser,
                 _token: token,
             },
             success: function (data) {
@@ -24,13 +40,10 @@ $(document).ready(function () {
                     container: "floating",
                     timer: 4000,
                 });
-                var table = $("#tbUsuarios").DataTable();
-                table.row
-                    .add({
-                        id: data.id,
-                        name: name,
-                    })
-                    .draw(false);
+    
+                $("#tbUsuarios").DataTable().ajax.reload();
+                $("#modalNuevoUsuario").modal("hide");
+
                 $("#cerrarModal").click();
             },
             error: function (jqXHR, textStatus, errorThrown) {
@@ -38,13 +51,14 @@ $(document).ready(function () {
                 $.niftyNoty({
                     type: "danger",
                     icon: "fa fa-times",
-                    message: "Error al registrar: " + textStatus,
+                    message: "Error al registrar: " + (jqXHR.responseJSON.message || textStatus),
                     container: "floating",
                     timer: 4000,
                 });
             },
         });
     });
+    
 
     // Obtener opciones de tipos de usuario desde la ruta
     $.ajax({

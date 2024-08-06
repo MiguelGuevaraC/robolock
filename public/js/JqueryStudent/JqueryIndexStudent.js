@@ -11,29 +11,29 @@ var columns = [
     {
         data: "documentNumber",
         render: function (data, type, row, meta) {
-            if (row.typeofDocument === "DNI") {
-                return `${row.documentNumber} | ${row.names} ${row.fatherSurname} ${row.motherSurname}`;
-            } else if (row.typeofDocument === "RUC") {
-                return `${row.documentNumber} | ${row.businessName || ''}`;
-            }
+            return `${row.uid} |${row.documentNumber} | ${row.names} ${row.fatherSurname} ${row.motherSurname}`;
         },
         orderable: false,
     },
-    { data: "status" },
-    { data: "state" },
+    {
+        data: "dateBirth",
+        render: function (data, type, row, meta) {
+            if (data != null) {
+                return data; // Formato de fecha
+            } else {
+                return "-"; // Formato de fecha
+            }
+        },
+    },
     {
         data: "email",
         render: function (data, type, row, meta) {
-            return data ? data : 'No disponible';
+            return data ? data : "No disponible";
         },
     },
     { data: "telephone" },
-    {
-        data: "created_at",
-        render: function (data, type, row, meta) {
-            return new Date(data).toLocaleDateString(); // Formato de fecha
-        },
-    },
+
+
     {
         data: null,
         render: function (data, type, full, meta) {
@@ -41,14 +41,13 @@ var columns = [
                 <a href="javascript:void(0)" onclick="editPerson(${data.id})" style="background:#ffc107; color:white;" class="btn btn-info"> 
                     <i class="fas fa-edit"></i>
                 </a>
-                <a href="javascript:void(0)" onclick="destroyPerson(${data.id})" style="background:red; color:white;" class="btn btn-info"> 
+                <a href="javascript:void(0)" onclick="destroyStudent(${data.id})" style="background:red; color:white;" class="btn btn-info"> 
                     <i class="fas fa-trash"></i>
                 </a>
              `;
         },
     },
 ];
-
 
 var lenguag = {
     lengthMenu: "Mostrar _MENU_ Registros por paginas",
@@ -187,8 +186,8 @@ $(document).ready(function () {
             type: "GET",
             data: function (d) {
                 // Aquí configuramos los filtros de búsqueda por columna
-                $('#tbStudents .filters input').each(function () {
-                    var name = $(this).attr('name');
+                $("#tbStudents .filters input").each(function () {
+                    var name = $(this).attr("name");
                     d.columns.forEach(function (column) {
                         if (column.data === name) {
                             column.search.value = $(this).val();
@@ -196,7 +195,7 @@ $(document).ready(function () {
                     }, this);
                 });
             },
-            debounce: 500 ,
+            debounce: 500,
             error: function (xhr, error, thrown) {
                 // Manejo de errores
                 console.error("Error en la solicitud AJAX:", error);
@@ -204,15 +203,21 @@ $(document).ready(function () {
                 // Intentar nuevamente si no se alcanzó el número máximo de reintentos
                 if (retryCount < maxRetries) {
                     retryCount++;
-                    console.log("Reintentando... (Intento " + retryCount + " de " + maxRetries + ")");
+                    console.log(
+                        "Reintentando... (Intento " +
+                            retryCount +
+                            " de " +
+                            maxRetries +
+                            ")"
+                    );
                     fetchTableData(retryCount);
-                } 
-            }
+                }
+            },
         },
         orderCellsTop: true,
         fixedHeader: true,
         columns: columns,
-        dom: "Bfrtip",
+        dom: "Brtip",
         buttons: [],
 
         language: lenguag,

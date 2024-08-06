@@ -36,18 +36,22 @@ class Person extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'typeofDocument', 'documentNumber', 'names', 'fatherSurname', 'motherSurname',
+        'typeofDocument','uid', 'documentNumber', 'names', 'fatherSurname', 
+        'motherSurname',
         'dateBirth', 'email', 'telephone', 'status', 'state'
     ];
 
     public function photos()
     {
-        return $this->hasMany(Photo::class);
+        // Define la relación hasMany especificando la clave foránea 'person_id'
+        return $this->hasMany(Photo::class, 'person_id');
     }
-
+    
     public function accessLogs()
     {
-        return $this->hasMany(AccessLog::class);
+        // Define la relación hasMany especificando la clave foránea 'person_id'
+        return $this->hasMany(AccessLog::class, 'person_id');
     }
+    
 
 }

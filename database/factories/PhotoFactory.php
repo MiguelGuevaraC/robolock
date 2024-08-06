@@ -23,7 +23,7 @@ class PhotoFactory extends Factory
             'photoPath' => $this->faker->imageUrl(),
             'state' => true,
             'status' => 'Active',
-            'authorized_person_id' => null
+            'person_id' => null
         ];
     }
 }

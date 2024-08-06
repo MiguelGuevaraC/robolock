@@ -19,7 +19,7 @@ var columns = [
     {
         data: "type_user",
         render: function (data, type, row, meta) {
-            return data["name"];
+            return data['name'];
         },
         orderable: false,
     },
@@ -173,7 +173,7 @@ $(document).ready(function () {
         orderCellsTop: true,
         fixedHeader: true,
         columns: columns,
-        dom: "Bfrtip",
+        dom: "Brtip",
         buttons: butomns,
         lengthMenu: lengthmenu,
         language: lenguag,

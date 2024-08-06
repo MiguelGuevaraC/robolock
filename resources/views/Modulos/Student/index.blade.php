@@ -22,13 +22,13 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <?php
-    $vista = 'Estudiantes';
-    $categoriaActual = 'Movimientos';
+    $vista = 'Personas Autorizadas';
+    $categoriaActual = 'Administración';
     $OpcionActual = 'estudiante';
     
     ?>
 
-    <title>Mensajería | {{ $vista }}</title>
+    <title>Robolock | {{ $vista }}</title>
     <link type="image/png" href="plantillaNuevo\img\logo.png" rel="icon">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
@@ -101,7 +101,7 @@
                     <a href='vistaInicio' class="navbar-brand">
                         {{-- <img src="plantillaNuevo\img\logo.png" alt="Nifty Logo" class="brand-icon"> --}}
                         <div class="brand-title">
-                            <span class="brand-text">Mensajería</span>
+                            <span class="brand-text">Robolock</span>
                         </div>
                     </a>
                 </div>

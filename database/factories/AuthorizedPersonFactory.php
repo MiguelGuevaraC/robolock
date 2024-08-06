@@ -21,6 +21,7 @@ class PersonFactory extends Factory
         return [
             'typeofDocument' => $this->faker->randomElement(['DNI', 'Passport']),
             'documentNumber' => $this->faker->unique()->numberBetween(10000000, 99999999),
+            'uid' => $this->faker->unique()->numberBetween(10000000, 99999999),
             'names' => $this->faker->firstName,
             'fatherSurname' => $this->faker->lastName,
             'motherSurname' => $this->faker->lastName,

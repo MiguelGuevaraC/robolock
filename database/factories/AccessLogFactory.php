@@ -23,7 +23,7 @@ class AccessLogFactory extends Factory
             'status' => $this->faker->randomElement(['Authorizado', 'No Authorizado']),
             'breakPoint' => $this->faker->randomElement(['RFID', 'FR']),
 
-            'authorized_person_id' => null,
+            'person_id' => null,
         ];
     }
 }

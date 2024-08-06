@@ -93,8 +93,8 @@ class DatabaseSeeder extends Seeder
         $people = Person::factory(3)->create();
 
         foreach ($people as $person) {
-            Photo::factory(3)->create(['authorized_person_id' => $person->id]);
-            AccessLog::factory(5)->create(['authorized_person_id' => $person->id]);
+            Photo::factory(3)->create(['person_id' => $person->id]);
+            AccessLog::factory(5)->create(['person_id' => $person->id]);
         }
 
         $this->call(GroupMenuSeeder::class);

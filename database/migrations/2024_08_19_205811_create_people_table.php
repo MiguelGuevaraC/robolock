@@ -13,6 +13,7 @@ return new class extends Migration
             $table->string('typeofDocument')->nullable();
             $table->string('documentNumber')->unique()->nullable();
             $table->string('names')->nullable();
+            $table->string('uid')->nullable();
             $table->string('fatherSurname')->nullable();
             $table->string('motherSurname')->nullable();
             $table->date('dateBirth')->nullable();

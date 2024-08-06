@@ -44,82 +44,6 @@
 //     });
 // });
 
-$(document).ready(function () {
-    $("#registroStudent").on("submit", function (e) {
-        e.preventDefault();
-
-        let formData = new FormData(this);
-
-        // Leer el archivo Excel
-        let file = $("#excelFile")[0].files[0];
-        if (file) {
-            let reader = new FileReader();
-            reader.onload = function (e) {
-                let data = new Uint8Array(e.target.result);
-                let workbook = XLSX.read(data, { type: "array" });
-
-                // Suponiendo que los datos están en la primera hoja
-                let firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                let excelData = XLSX.utils.sheet_to_json(firstSheet, {
-                    header: 1,
-                });
-
-                // Guardar el archivo en el servidor
-                formData.append("excelFile", file);
-                $("#modalNuevoStudent").modal("hide");
-                // Mostrar alerta de espera
-                Swal.fire({
-                    title: "Por favor espera...",
-                    text: "Estamos procesando tu solicitud.",
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                        // Ajustar el z-index para que SweetAlert esté por encima del modal
-                        $(".swal2-container").css("z-index", "2000");
-                    },
-                });
-
-                // Realizar la solicitud AJAX
-                $.ajax({
-                    url: "importExcel", // Ajusta la ruta según tu configuración de Laravel
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        console.log(response);
-                        // Cerrar la alerta de SweetAlert
-                        Swal.close();
-                        // Aquí puedes manejar la respuesta del servidor
-
-                        $("#tbStudents").DataTable().ajax.reload();
-                    },
-                    error: function (xhr, status, error) {
-                        // Cerrar la alerta de SweetAlert
-                        Swal.close();
-                        // Mostrar mensaje de error
-                        Swal.fire({
-                            icon: "error",
-                            title: "Error",
-                            text: "Hubo un problema al procesar la solicitud.",
-                        });
-                    },
-                    headers: {
-                        "X-CSRF-TOKEN": $('input[name="_token"]').val(),
-                    },
-                });
-            };
-            reader.readAsArrayBuffer(file);
-        } else {
-            Swal.fire({
-                icon: "warning",
-                title: "Archivo no seleccionado",
-                text: "Por favor, selecciona un archivo Excel.",
-            });
-        }
-    });
-});
-
 $("#btonNuevo").click(function (e) {
     $("#registroPersona")[0].reset();
     $("#modalNuevoStudent").modal("show");
@@ -267,31 +191,67 @@ photoUpload.addEventListener("change", function () {
     updateCapturedPhotos();
 });
 
-// Enviar los datos al servidor
-$("#registroPersona").on("submit", function (e) {
-    e.preventDefault();
-    let formData = new FormData(this);
-    photos.forEach((photo, index) => {
-        formData.append(`photos[${index}]`, photo.blob, `photo${index}.png`);
-    });
+$(document).ready(function () {
+    $("#registroPersona").on("submit", function (e) {
+        e.preventDefault();
 
-    $.ajax({
-        type: "POST",
-        url: "student",
-        data: formData,
-        contentType: false,
-        processData: false,
-        success: function (response) {
-            alert("Persona guardada exitosamente");
-            $("#modalNuevoStudent").modal("hide");
-            $("#registroPersona")[0].reset();
-            photos = [];
-            updateCapturedPhotos();
-            stopCamera();
-        },
-        error: function (error) {
-            console.error(error);
-            alert("Error al guardar la persona");
-        },
+        let formData = new FormData(this);
+
+        let telefono = formData.get("telefono").replace(/\s+/g, "");
+
+        // Validar que telefono tenga exactamente 9 dígitos
+        let telefonoRegex = /^\d{9}$/;
+        if (telefono != "" && telefono && !telefonoRegex.test(telefono)) {
+            toastr.error(
+                "El teléfono debe contener exactamente 9 dígitos sin espacios.",
+                "Error en el teléfono"
+            );
+            return;
+        }
+        formData.set("telefono", telefono);
+
+        // Validar que haya al menos 3 fotos
+        if (photos.length < 3) {
+            toastr.error("Debe enviar al menos 3 fotos.", "Error en las fotos");
+            return;
+        }
+
+        photos.forEach((photo, index) => {
+            formData.append(
+                `photos[${index}]`,
+                photo.blob,
+                `photo${index}.png`
+            );
+        });
+
+        $.ajax({
+            type: "POST",
+            url: "estudiante",
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (response) {
+                toastr.success("Persona registrada con éxito.", "¡Éxito!");
+                $("#modalNuevoStudent").modal("hide");
+                $("#registroPersona")[0].reset();
+                $("#tbStudents").DataTable().ajax.reload();
+                photos = [];
+                updateCapturedPhotos();
+                stopCamera();
+            },
+            error: function (error) {
+                if (error.status === 422) {
+                    let errors = error.responseJSON.errors;
+                    let errorMessage = "Errores de validación:";
+                    for (let field in errors) {
+                        errorMessage += `\n- ${errors[field].join(" ")}`;
+                    }
+                    toastr.error(errorMessage, "Error de Validación");
+                } else {
+                    console.error(error);
+                    toastr.error("Error al guardar la persona.", "Error");
+                }
+            },
+        });
     });
 });

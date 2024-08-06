@@ -17,7 +17,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
    
-            $table->foreignId('authorized_person_id')->nullable()->unsigned()->constrained('people');
+            $table->foreignId('person_id')->nullable()->unsigned()->constrained('people');
 
         });
     }

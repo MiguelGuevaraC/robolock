@@ -11,7 +11,7 @@ class Photo extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'photoPath', 'state', 'status', 'authorized_person_id'
+        'photoPath', 'state', 'status', 'person_id'
     ];
 
     public function authorizedPerson()
