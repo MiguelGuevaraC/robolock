@@ -79,8 +79,8 @@
 
 
     <!-- CSS DEL DATATABLE -->
-    <link rel="stylesheet" href="/manuelPardoWhatsapp/Cdn-Locales/pkgDatatables/datatables.css">
-    <link rel="stylesheet" href="/manuelPardoWhatsapp/Cdn-Locales/pkgAwsome/css/all.css" />
+    <link rel="stylesheet" href="/robolock/Cdn-Locales/pkgDatatables/datatables.css">
+    <link rel="stylesheet" href="/robolock/Cdn-Locales/pkgAwsome/css/all.css" />
 
     <link rel="stylesheet" href="{{ asset('css/appPlantilla.css') }}">
 
@@ -424,9 +424,9 @@
 
 
     <!-- JS DE DATATABLE -->
-    <script src="/manuelPardoWhatsapp/Cdn-Locales/pkgDatatables/datatables.js"></script>
+    <script src="/robolock/Cdn-Locales/pkgDatatables/datatables.js"></script>
 
-    <script src="/manuelPardoWhatsapp/Cdn-Locales/pkgAwsome/js/all.js"></script>
+    <script src="/robolock/Cdn-Locales/pkgAwsome/js/all.js"></script>
 
     <!--Bootstrap Table Sample [ SAMPLE ]-->
     <script src="plantillaNuevo\js\demo\tables-bs-table.js"></script>
