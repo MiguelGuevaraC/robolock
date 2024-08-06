@@ -475,17 +475,17 @@ class PersonController extends Controller
             foreach ($request->file('photosEd') as $file) {
                 $filename = time() . '_' . $file->getClientOriginalName();
                 $filePath = $file->storeAs('public/photos/' . $person->id, $filename);
-    
+
                 // Asegúrate de que el directorio tenga permisos adecuados
                 $directoryPath = storage_path('app/public/photos/' . $person->id);
                 if (!is_dir($directoryPath)) {
                     mkdir($directoryPath, 0777, true); // Crear directorio con permisos 0777
                 }
-    
+
                 // Asegúrate de que el archivo tenga permisos adecuados
                 $absoluteFilePath = storage_path('/app/public/photos/' . $person->id . '/' . $filename);
                 chmod($absoluteFilePath, 0777);
-    
+
                 Photo::create([
                     'person_id' => $person->id,
                     'photoPath' => Storage::url('/app/public/photos/' . $person->id . '/' . $filename),
@@ -494,8 +494,23 @@ class PersonController extends Controller
             }
         }
 
+        // Aplicar permisos recursivos a la carpeta
+        $absoluteDirectoryPath = storage_path('app/public/photos/' . $person->id);
+        $this->recursiveChmod($absoluteDirectoryPath, 0777);
+
         // Devolver la respuesta con el objeto actualizado
         return response()->json($person, 200);
+    }
+
+    private function recursiveChmod($path, $permissions)
+    {
+        $dir = new \DirectoryIterator($path);
+        foreach ($dir as $item) {
+            chmod($item->getPathname(), $permissions);
+            if ($item->isDir() && !$item->isDot()) {
+                $this->recursiveChmod($item->getPathname(), $permissions);
+            }
+        }
     }
 
     /**
