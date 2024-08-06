@@ -244,7 +244,7 @@ class PersonController extends Controller
 
                 $filename = time() . '_' . $file->getClientOriginalName();
                 $filePath = $file->storeAs('public/photos/' . $person->id, $filename);
-
+                Storage::chmod($filePath, 0777);
                 Photo::create([
                     'person_id' => $person->id,
                     'photoPath' => Storage::url('app/public/photos/' . $person->id . '/' . $filename),
@@ -475,7 +475,7 @@ class PersonController extends Controller
             foreach ($request->file('photosEd') as $file) {
                 $filename = time() . '_' . $file->getClientOriginalName();
                 $filePath = $file->storeAs('public/photos/' . $person->id, $filename);
-
+                Storage::chmod($filePath, 0777);
                 Photo::create([
                     'person_id' => $person->id,
                     'photoPath' => Storage::url('app/public/photos/' . $person->id . '/' . $filename),
