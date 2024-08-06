@@ -238,23 +238,33 @@ class PersonController extends Controller
         // Creación del objeto Person
         $person = Person::create($data);
 
-        // Manejo de las fotos
         if ($request->hasFile('photos')) {
             foreach ($request->file('photos') as $file) {
-
                 $filename = time() . '_' . $file->getClientOriginalName();
                 $filePath = $file->storeAs('public/photos/' . $person->id, $filename);
-                Storage::chmod($filePath, 0777);
+    
+                // Asegúrate de que el directorio tenga permisos adecuados
+                $directoryPath = storage_path('app/public/photos/' . $person->id);
+                if (!is_dir($directoryPath)) {
+                    mkdir($directoryPath, 0777, true); // Crear directorio con permisos 0777
+                }
+    
+                // Asegúrate de que el archivo tenga permisos adecuados
+                $absoluteFilePath = storage_path('app/' . $filePath);
+                chmod($absoluteFilePath, 0777);
+    
                 Photo::create([
                     'person_id' => $person->id,
-                    'photoPath' => Storage::url('app/public/photos/' . $person->id . '/' . $filename),
+                    'photoPath' => Storage::url('public/photos/' . $person->id . '/' . $filename),
                     'status' => 'Activo',
                 ]);
             }
         }
 
-        $absoluteDirectoryPath = storage_path('app/public/photos/' . $person->id);
+      // Aplicar permisos recursivos a la carpeta
+    $absoluteDirectoryPath = storage_path('app/public/photos/' . $person->id);
     $this->recursiveChmod($absoluteDirectoryPath, 0777);
+    
         $person = Person::find($person->id);
 
         // Devolver la respuesta con el objeto creado
