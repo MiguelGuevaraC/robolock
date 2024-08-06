@@ -103,24 +103,13 @@ function stopCamera() {
 if (navigator.mediaDevices && typeof navigator.mediaDevices.enumerateDevices === 'function') {
     console.log("MediaDevices API está disponible");
 
-    // Verifica si la página está servida a través de HTTPS
-    if (location.protocol !== 'https:') {
-        // Mostrar un mensaje al usuario sobre la necesidad de HTTPS
-        const confirmation = confirm("La conexión no es segura (no está en HTTPS). ¿Deseas habilitar la cámara de todos modos? La funcionalidad puede no funcionar correctamente en una conexión no segura.");
-        
-        if (!confirmation) {
-            console.log("El usuario ha decidido no habilitar la cámara.");
-            return;
-        }
-    }
-
     navigator.mediaDevices.enumerateDevices()
         .then((devices) => {
             console.log("Dispositivos encontrados:", devices);
-            
+
             const videoDevices = devices.filter((device) => device.kind === "videoinput");
             console.log("Dispositivos de video encontrados:", videoDevices);
-            
+
             const cameraSelect = document.getElementById('cameraSelect');
             if (!cameraSelect) {
                 console.log("Elemento con ID 'cameraSelect' no encontrado.");
@@ -145,17 +134,15 @@ if (navigator.mediaDevices && typeof navigator.mediaDevices.enumerateDevices ===
                     stopCamera();
                 }
             });
+            devices.forEach(device => console.log(device));
         })
         .catch((error) => {
             console.log("Error al enumerar los dispositivos:", error);
+            console.log("log al enumerar los dispositivos:", log);
         });
-} else {
-    console.log("La API de MediaDevices no está disponible.");
+} else{
+    console.log('error de camara');
 }
-
-
-
-
 
 // Encender y apagar la cámara según el estado del modal
 $("#modalNuevoStudent").on("shown.bs.modal", function () {
