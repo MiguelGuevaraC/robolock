@@ -101,46 +101,18 @@ function stopCamera() {
 }
 
 if (navigator.mediaDevices && typeof navigator.mediaDevices.enumerateDevices === 'function') {
-    console.log("MediaDevices API está disponible");
-
     navigator.mediaDevices.enumerateDevices()
         .then((devices) => {
             console.log("Dispositivos encontrados:", devices);
-            
-            const videoDevices = devices.filter((device) => device.kind === "videoinput");
-            console.log("Dispositivos de video encontrados:", videoDevices);
-            
-            const cameraSelect = document.getElementById('cameraSelect');
-            if (!cameraSelect) {
-                console.log("Elemento con ID 'cameraSelect' no encontrado.");
-                return;
-            }
-
-            cameraSelect.innerHTML = '';
-
-            videoDevices.forEach((device, index) => {
-                const option = document.createElement('option');
-                option.value = device.deviceId;
-                option.text = `Cámara ${index + 1} (${device.label || 'Desconocida'})`;
-                cameraSelect.appendChild(option);
-            });
-
-            cameraSelect.addEventListener('change', function () {
-                const selectedDeviceId = cameraSelect.value;
-                console.log("Cámara seleccionada:", selectedDeviceId);
-                if (selectedDeviceId) {
-                    startCamera(selectedDeviceId);
-                } else {
-                    stopCamera();
-                }
-            });
+            devices.forEach(device => console.log(device));
         })
         .catch((error) => {
-            console.log("Error al enumerar los dispositivos:", error);
+            console.log("log al enumerar los dispositivos:", log);
         });
 } else {
     console.log("La API de MediaDevices no está disponible.");
 }
+
 
 
 
