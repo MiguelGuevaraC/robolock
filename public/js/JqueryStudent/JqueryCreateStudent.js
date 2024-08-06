@@ -101,28 +101,39 @@ function stopCamera() {
 }
 
 // Enumerar dispositivos de vídeo y configurar el selector de cámara
-navigator.mediaDevices
-    .enumerateDevices()
+// Primero, revisamos los dispositivos disponibles
+navigator.mediaDevices.enumerateDevices()
     .then((devices) => {
-        devices = devices.filter((device) => device.kind === "videoinput");
-        devices.forEach((device, index) => {
-            let option = document.createElement("option");
+        // Filtramos solo los dispositivos de tipo "videoinput"
+        const videoDevices = devices.filter((device) => device.kind === "videoinput");
+        
+        // Obtenemos la referencia al elemento <select> donde se listarán las cámaras
+        const cameraSelect = document.getElementById('cameraSelect');
+        
+        // Limpiamos el contenido actual del <select>
+        cameraSelect.innerHTML = '';
+
+        // Iteramos sobre los dispositivos de video y los agregamos como opciones al <select>
+        videoDevices.forEach((device, index) => {
+            const option = document.createElement('option');
             option.value = device.deviceId;
-            option.text = device.label || `Cámara ${index + 1}`;
+            option.text = `Cámara ${index + 1} (${device.label || 'Desconocida'})`;
             cameraSelect.appendChild(option);
         });
-
-        cameraSelect.addEventListener("change", function () {
+        
+        // Agregamos un evento para manejar la selección de la cámara
+        cameraSelect.addEventListener('change', function () {
             if (cameraSelect.value) {
-                startCamera();
+                startCamera();  // Función para iniciar la cámara
             } else {
-                stopCamera();
+                stopCamera();   // Función para detener la cámara
             }
         });
     })
     .catch((error) => {
-        console.error(error);
+        console.error("Error al enumerar los dispositivos:", error);
     });
+
 
 // Encender y apagar la cámara según el estado del modal
 $("#modalNuevoStudent").on("shown.bs.modal", function () {
