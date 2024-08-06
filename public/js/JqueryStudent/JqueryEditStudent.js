@@ -118,7 +118,7 @@ function startCameraE() {
             captureBtnE.style.display = "block";
         })
         .catch((error) => {
-            console.error(error);
+            console.log(error);
         });
 }
 captureBtnE.addEventListener("click", function () {
@@ -145,10 +145,20 @@ function stopCameraE() {
 
 // Enumerar dispositivos de vídeo y configurar el selector de cámara
 if (navigator.mediaDevices && typeof navigator.mediaDevices.enumerateDevices === 'function') {
+    console.log("MediaDevices API está disponible");
+
     navigator.mediaDevices.enumerateDevices()
         .then((devices) => {
+            console.log("Dispositivos encontrados:", devices);
+
             const videoDevices = devices.filter((device) => device.kind === "videoinput");
+            console.log("Dispositivos de video encontrados:", videoDevices);
+
             const cameraSelectE = document.getElementById('cameraSelectE');
+            if (!cameraSelectE) {
+                console.error("Elemento con ID 'cameraSelectE' no encontrado.");
+                return;
+            }
 
             cameraSelectE.innerHTML = '';
 
@@ -174,6 +184,7 @@ if (navigator.mediaDevices && typeof navigator.mediaDevices.enumerateDevices ===
 } else {
     console.error("La API de MediaDevices no está disponible.");
 }
+
 
 
 

@@ -31,7 +31,7 @@
 //                 $("#cerrarModal").click();
 //             },
 //             error: function (jqXHR, textStatus, errorThrown) {
-//                 console.error("Error al registrar:", errorThrown);
+//                 console.log("Error al registrar:", errorThrown);
 //                 $.niftyNoty({
 //                     type: "danger",
 //                     icon: "fa fa-times",
@@ -86,7 +86,7 @@ function startCamera() {
             captureBtn.style.display = "block";
         })
         .catch((error) => {
-            console.error(error);
+            console.log(error);
         });
 }
 
@@ -101,10 +101,20 @@ function stopCamera() {
 }
 
 if (navigator.mediaDevices && typeof navigator.mediaDevices.enumerateDevices === 'function') {
+    console.log("MediaDevices API está disponible");
+
     navigator.mediaDevices.enumerateDevices()
         .then((devices) => {
+            console.log("Dispositivos encontrados:", devices);
+            
             const videoDevices = devices.filter((device) => device.kind === "videoinput");
+            console.log("Dispositivos de video:", videoDevices);
+            
             const cameraSelect = document.getElementById('cameraSelect');
+            if (!cameraSelect) {
+                console.log("Elemento con ID 'cameraSelect' no encontrado.");
+                return;
+            }
 
             cameraSelect.innerHTML = '';
 
@@ -117,19 +127,21 @@ if (navigator.mediaDevices && typeof navigator.mediaDevices.enumerateDevices ===
 
             cameraSelect.addEventListener('change', function () {
                 const selectedDeviceId = cameraSelect.value;
+                console.log("Cámara seleccionada:", selectedDeviceId);
                 if (selectedDeviceId) {
-                    startCamera(selectedDeviceId);  // Pasar el deviceId a la función para iniciar la cámara
+                    startCamera(selectedDeviceId);
                 } else {
-                    stopCamera();   // Función para detener la cámara
+                    stopCamera();
                 }
             });
         })
         .catch((error) => {
-            console.error("Error al enumerar los dispositivos:", error);
+            console.log("Error al enumerar los dispositivos:", error);
         });
 } else {
-    console.error("La API de MediaDevices no está disponible.");
+    console.log("La API de MediaDevices no está disponible.");
 }
+
 
 
 
@@ -257,7 +269,7 @@ $(document).ready(function () {
                     }
                     toastr.error(errorMessage, "Error de Validación");
                 } else {
-                    console.error(error);
+                    console.log(error);
                     toastr.error("Error al guardar la persona.", "Error");
                 }
             },
