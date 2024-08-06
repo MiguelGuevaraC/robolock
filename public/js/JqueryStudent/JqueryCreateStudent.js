@@ -101,18 +101,57 @@ function stopCamera() {
 }
 
 if (navigator.mediaDevices && typeof navigator.mediaDevices.enumerateDevices === 'function') {
+    console.log("MediaDevices API está disponible");
+
+    // Verifica si la página está servida a través de HTTPS
+    if (location.protocol !== 'https:') {
+        // Mostrar un mensaje al usuario sobre la necesidad de HTTPS
+        const confirmation = confirm("La conexión no es segura (no está en HTTPS). ¿Deseas habilitar la cámara de todos modos? La funcionalidad puede no funcionar correctamente en una conexión no segura.");
+        
+        if (!confirmation) {
+            console.log("El usuario ha decidido no habilitar la cámara.");
+            return;
+        }
+    }
+
     navigator.mediaDevices.enumerateDevices()
         .then((devices) => {
             console.log("Dispositivos encontrados:", devices);
-            devices.forEach(device => console.log(device));
+            
+            const videoDevices = devices.filter((device) => device.kind === "videoinput");
+            console.log("Dispositivos de video encontrados:", videoDevices);
+            
+            const cameraSelect = document.getElementById('cameraSelect');
+            if (!cameraSelect) {
+                console.log("Elemento con ID 'cameraSelect' no encontrado.");
+                return;
+            }
+
+            cameraSelect.innerHTML = '';
+
+            videoDevices.forEach((device, index) => {
+                const option = document.createElement('option');
+                option.value = device.deviceId;
+                option.text = `Cámara ${index + 1} (${device.label || 'Desconocida'})`;
+                cameraSelect.appendChild(option);
+            });
+
+            cameraSelect.addEventListener('change', function () {
+                const selectedDeviceId = cameraSelect.value;
+                console.log("Cámara seleccionada:", selectedDeviceId);
+                if (selectedDeviceId) {
+                    startCamera(selectedDeviceId);
+                } else {
+                    stopCamera();
+                }
+            });
         })
         .catch((error) => {
-            console.log("log al enumerar los dispositivos:", log);
+            console.log("Error al enumerar los dispositivos:", error);
         });
 } else {
     console.log("La API de MediaDevices no está disponible.");
 }
-
 
 
 
