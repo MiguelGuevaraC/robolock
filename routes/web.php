@@ -82,3 +82,5 @@ Route::group(['middleware' => ['auth']], function () {
     Route::put('estudiante/{id}', [PersonController::class, 'update']);
     Route::delete('estudiante/{id}', [PersonController::class, 'destroy']);
 });
+
+
