@@ -30,6 +30,7 @@ class ApiController extends Controller
             'breakPoint' => 'required|string|in:RFID,CAMARA,SISTEMA',
             'person_id' => 'nullable|exists:people,id', // Asegúrate de que el ID existe en la tabla `people`
         ]);
+        
 
         if ($validator->fails()) {
             return response()->json([

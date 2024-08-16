@@ -15,16 +15,7 @@ var columns = [
         },
         orderable: false,
     },
-    {
-        data: "dateBirth",
-        render: function (data, type, row, meta) {
-            if (data != null) {
-                return data; // Formato de fecha
-            } else {
-                return "-"; // Formato de fecha
-            }
-        },
-    },
+
     {
         data: "email",
         render: function (data, type, row, meta) {
@@ -118,10 +109,7 @@ var init = function () {
                 colIdx == 0 ||
                 colIdx == 1 ||
                 colIdx == 2 ||
-                colIdx == 3 ||
-                colIdx == 5 ||
-                colIdx == 4 ||
-                colIdx == 6
+                colIdx == 3 
             ) {
                 var cell = $(".filters th").eq(
                     $(api.column(colIdx).header()).index()

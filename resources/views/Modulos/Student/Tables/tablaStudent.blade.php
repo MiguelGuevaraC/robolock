@@ -3,7 +3,7 @@
         <tr class="custom-header-bg">
             <th scope="col">#</th>
             <th scope="col">Persona</th>
-            <th scope="col">Fecha Nacimiento</th>
+            {{-- <th scope="col">Fecha Nacimiento</th> --}}
             <th scope="col">Correo</th>
             <th scope="col">Telefono</th>
 
