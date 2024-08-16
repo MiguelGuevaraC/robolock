@@ -27,8 +27,8 @@ class ApiController extends Controller
         $validator = Validator::make($request->all(), [
 
             'status' => 'required|in:Permitido,Denegado', // Cambia los valores según tu lógica
-            'breakPoint' => 'required|string|in:50,100',
-            'person_id' => 'required|exists:people,id', // Asegúrate de que el ID existe en la tabla `people`
+            'breakPoint' => 'required|string|in:RFID,CAMARA,SISTEMA',
+            'person_id' => 'nullable|exists:people,id', // Asegúrate de que el ID existe en la tabla `people`
         ]);
 
         if ($validator->fails()) {
