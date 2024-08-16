@@ -11,11 +11,11 @@ class AccessLog extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'state', 'status', 'breakPoint',  'authorized_person_id'
+        'state', 'status', 'breakPoint',  'person_id'
     ];
 
     public function authorizedPerson()
     {
-        return $this->belongsTo(Person::class);
+        return $this->belongsTo(Person::class,'person_id');
     }
 }

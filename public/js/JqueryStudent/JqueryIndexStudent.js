@@ -49,6 +49,7 @@ var columns = [
     },
 ];
 
+
 var lenguag = {
     lengthMenu: "Mostrar _MENU_ Registros por paginas",
     zeroRecords: "No hay Registros",

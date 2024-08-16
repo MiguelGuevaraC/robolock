@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\auth\AuthController;
 use App\Http\Controllers\InicioController;
+use App\Http\Controllers\web\AccessController;
 use App\Http\Controllers\web\GroupMenuController;
 use App\Http\Controllers\web\OptionMenuController;
 use App\Http\Controllers\web\PersonController;
@@ -81,6 +82,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('estudiante', [PersonController::class, 'store']);
     Route::put('estudiante/{id}', [PersonController::class, 'update']);
     Route::delete('estudiante/{id}', [PersonController::class, 'destroy']);
+
+    //STUDENTS
+    Route::get('reporteaccesos', [AccessController::class, 'index']);
+    Route::get('reporteaccesosAll', [AccessController::class, 'all']);
+    Route::get('countRecords', [AccessController::class, 'countRecords']);
 });
 
 

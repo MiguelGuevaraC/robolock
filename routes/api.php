@@ -22,3 +22,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 Route::get('searchByUid/{uid}', [ApiController::class, 'searchByUid']);
+Route::post('reporteaccesos', [ApiController::class, 'store']);
