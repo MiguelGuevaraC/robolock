@@ -710,3 +710,12 @@ table th {
     
 }
 
+@keyframes blink {
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.blinking {
+    animation: blink 1s infinite;
+}

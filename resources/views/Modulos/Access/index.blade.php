@@ -81,6 +81,7 @@
     <!-- CSS DEL DATATABLE -->
     <link rel="stylesheet" href="/robolock/Cdn-Locales/pkgDatatables/datatables.css">
     <link rel="stylesheet" href="/robolock/Cdn-Locales/pkgAwsome/css/all.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     <link rel="stylesheet" href="{{ asset('css/appPlantilla.css') }}">
 
@@ -175,6 +176,10 @@
 
                     </ul>
                     <ul class="nav navbar-top-links">
+
+                        
+                        
+                        
                         <?php foreach ($groupMenu as $item): ?>
 
                         @foreach ($item['option_menus'] as $menu)
@@ -256,14 +261,16 @@
 
 
 
-                        <div class="panel  panel-colorful media middle pad-all panel-half" style="background: #396a91; color:white">
+                        <div class="panel  panel-colorful media middle pad-all panel-half"
+                            style="background: #396a91; color:white">
                             <div class="row">
                                 <div class="col-12 col-md-4 d-flex align-items-center my-2">
                                     <div class="pad-hor text-center">
                                         <i class="fa-regular fa-address-card icon-2x"></i>
                                     </div>
                                     <div class="media-body ml-2 text-center">
-                                        <p id="countAccessTotal" class="text-2x mar-no text-semibold">{{$totalAccessed}}</p>
+                                        <p id="countAccessTotal" class="text-2x mar-no text-semibold">
+                                            {{ $totalAccessed }}</p>
                                         {{-- <p id="amountAccessTotal" class="text-2x mar-no text-semibold">50</p> --}}
 
 
@@ -277,7 +284,8 @@
                                         <i class="fa-solid fa-lock-open icon-2x"></i>
                                     </div>
                                     <div class="media-body ml-2 text-center">
-                                        <p id="countAccess" class="text-2x mar-no text-semibold">{{$countAccessed}}</p>
+                                        <p id="countAccess" class="text-2x mar-no text-semibold">{{ $countAccessed }}
+                                        </p>
                                         {{-- <p id="amountAccess" class="text-2x mar-no text-semibold">100</p> --}}
 
                                         <p class="mar-no">Accesos Permitidos</p>
@@ -288,11 +296,12 @@
                                         <i class="fa-solid fa-lock icon-2x"></i>
                                     </div>
                                     <div class="media-body ml-2 text-center">
-                                        <p id="countNotAccessed" class="text-2x mar-no text-semibold">{{$countNotAccessed}}</p>
+                                        <p id="countNotAccessed" class="text-2x mar-no text-semibold">
+                                            {{ $countNotAccessed }}</p>
                                         {{-- <p id="amountAccessSelected" class="text-2x mar-no text-semibold">0.00</p> --}}
                                         <p class="mar-no">Accesos Denegados</p>
                                     </div>
-                                    
+
                                 </div>
                             </div>
                         </div>
@@ -302,7 +311,7 @@
 
                         <div id="demo-custom-toolbar2" class="">
 
-             
+
                         </div>
 
 
@@ -544,9 +553,10 @@
 
     <!--Modals [ SAMPLE ]-->
 
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    
     <script src="{{ asset('js/JqueryAccessLog/JqueryIndexAccessLog.js') }}"></script>
 
 </body>

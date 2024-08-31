@@ -118,11 +118,182 @@ function initialTableAccess() {
                     table.ajax.reload(null, false); // Recargar la tabla sin cambiar de página
                     lastFilteredCount = data; // Actualizar el último recuento conocido
                 }
-            }
+            },
         });
     }, 5000);
 }
 
 $(document).ready(function () {
     initialTableAccess();
+});
+$(document).ready(function () {
+    const checkInterval = 5000; // Intervalo de 5 segundos para actualizar notificaciones
+    let currentAlert = null; // Variable para guardar la alerta activa
+    let currentModal = null; // Variable para guardar el modal activo
+    let notificationsToMarkAsSeen = []; // Array para guardar las notificaciones que deben marcarse como vistas
+
+    // Función para cargar notificaciones nuevas
+    function loadNotifications() {
+        if (currentModal) return; // No cargar notificaciones si hay un modal activo
+
+        $.get("notificationsNew", function (data) {
+            console.log('Datos de notificaciones:', data); // Añade esto para verificar los datos
+            data.forEach(function (notification) {
+                if (notification.state === 1) {
+                    if (currentAlert) {
+                        console.log('Cerrando alerta anterior');
+                        currentAlert.close();
+                    }
+
+                    const createdAt = new Date(notification.created_at);
+                    const datePart = createdAt.toISOString().split("T")[0];
+                    const timePart = createdAt.toTimeString().split(" ")[0];
+                    const formattedDate = `${datePart},${timePart}`;
+                    const text = `Solicitud recibida el ${formattedDate}`;
+
+                    currentAlert = Swal.fire({
+                        title: "Nueva Solicitud de Acceso",
+                        text: text,
+                        icon: "info",
+                        position: "bottom-end",
+                        showConfirmButton: true,
+                        confirmButtonText: "Ver Detalles",
+                        timer: 5000,
+                        didOpen: (toast) => {
+                            toast.addEventListener("click", () => {
+                                console.log('Alerta clickeada, mostrando detalles');
+                                showDetails(notification.id);
+                            });
+                        },
+                    });
+
+                    notificationsToMarkAsSeen.push(notification.id);
+                }
+            });
+        });
+    }
+
+    // Mostrar modal con detalles de la notificación
+    function showDetails(notificationId) {
+        if (currentModal) return; // No abrir un nuevo modal si ya hay uno activo
+    
+        $.get(`notifications/${notificationId}`, function (data) {
+            console.log('Datos de la notificación:', data); // Añade esto para verificar los datos
+            const createdAt = new Date(data.created_at);
+            const datePart = createdAt.toISOString().split("T")[0];
+            const timePart = createdAt.toTimeString().split(" ")[0];
+            const formattedDate = `${datePart}, ${timePart}`;
+            const text = `${formattedDate}`;
+    
+            currentModal = Swal.fire({
+                title: "Detalles de la Solicitud de Acceso",
+                html: `
+                    <div style="text-align: center;">
+                        <img src="${data.photoPath}" alt="Imagen del Ingresante" style="width: 300px; height: 200px; object-fit: cover; border-radius: 8px;">
+                        <p style="margin-top: 10px;">Solicitud recibida el ${text}</p>
+                        <p style="font-weight: bold; margin-top: 10px;">Ingrese su contraseña para validar:</p>
+                        <input type="password" id="access-password-${data.id}" class="swal2-input" placeholder="Contraseña" style="margin-top: 10px;">
+                        <div style="margin-top: 20px;">
+                            <button class="btn btn-success btn-sm action-button" data-id="${data.id}" data-action="grant">Dar Acceso</button>
+                            <button class="btn btn-danger btn-sm deny-button">No Permitir</button>
+                        </div>
+                    </div>
+                `,
+                showCloseButton: true,
+                showConfirmButton: false,
+                customClass: {
+                    popup: "swal-notifications-popup",
+                },
+                didOpen: () => {
+                    $(".action-button").on("click", function () {
+                        let action = $(this).data("action");
+                        let password = $(`#access-password-${data.id}`).val();
+    
+                        if (password === "") {
+                            Swal.showValidationMessage("Por favor ingrese la contraseña");
+                            return;
+                        }
+    
+                        $.ajax({
+                            url: `notifications/${$(this).data("id")}`,
+                            method: "PUT",
+                            data: {
+                                status: "Permitido",
+                                action: action,
+                                password: password,
+                            },
+                            headers: {
+                                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                            },
+                            success: function (response) {
+                                Swal.fire("Hecho", response.message, "success")
+                                    .then(() => {
+                                        currentModal = null;
+                                        markNotificationsAsSeen();
+                                    });
+                            },
+                            error: function (xhr) {
+                                if (xhr.status === 422 && xhr.responseJSON.message === "Contraseña Incorrecta") {
+                                    alert("Contraseña Incorrecta");
+                                } else {
+                                    Swal.fire("Error", "Se produjo un error al procesar la solicitud", "error");
+                                }
+                            },
+                        });
+                    });
+    
+                    $(".deny-button").on("click", function () {
+                        $.ajax({
+                            url: `notifications/${data.id}`,
+                            method: "PUT",
+                            data: {
+                                status: "No Permitido",
+                            },
+                            headers: {
+                                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+                            },
+                            success: function (response) {
+                                Swal.fire("Hecho", response.message, "success")
+                                    .then(() => {
+                                        currentModal = null;
+                                        markNotificationsAsSeen();
+                                    });
+                            },
+                            error: function (xhr) {
+                                Swal.fire("Error", "Se produjo un error al procesar la solicitud", "error");
+                            },
+                        });
+                    });
+                },
+                didClose: () => {
+                    currentModal = null;
+                    markNotificationsAsSeen();
+                },
+            });
+        });
+    }
+    
+    
+
+    // Función para marcar las notificaciones como vistas
+    function markNotificationsAsSeen() {
+        if (notificationsToMarkAsSeen.length === 0) return;
+
+        $.ajax({
+            url: "notifications/mark-as-seen",
+            method: "PUT",
+            data: {
+                ids: notificationsToMarkAsSeen,
+            },
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+            },
+            success: function () {
+                notificationsToMarkAsSeen = [];
+            },
+        });
+    }
+
+    // Llamar a la función para cargar notificaciones nuevas cada 6 segundos
+    setInterval(loadNotifications, 6000);
 });

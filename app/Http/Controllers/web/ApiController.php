@@ -4,6 +4,7 @@ namespace App\Http\Controllers\web;
 
 use App\Http\Controllers\Controller;
 use App\Models\AccessLog;
+use App\Models\Notification;
 use App\Models\Person;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -19,7 +20,7 @@ class ApiController extends Controller
             return response()->json($person, 200);
         }
 
-        return response()->json(['message' => 'Person not found'], 404);
+        return response()->json(['message' => 'Persona no encontrada'], 404);
     }
 
     public function store(Request $request)
@@ -30,7 +31,6 @@ class ApiController extends Controller
             'breakPoint' => 'required|string|in:RFID,CAMARA,SISTEMA',
             'person_id' => 'nullable|exists:people,id', // Asegúrate de que el ID existe en la tabla `people`
         ]);
-        
 
         if ($validator->fails()) {
             return response()->json([
@@ -44,11 +44,30 @@ class ApiController extends Controller
             'breakPoint' => $request->input('breakPoint'),
             'person_id' => $request->input('person_id'),
         ]);
-        $accessLog=AccessLog::with(['authorizedPerson'])->find($accessLog->id);
+        $accessLog = AccessLog::with(['authorizedPerson'])->find($accessLog->id);
 
         return response()->json([
             'message' => 'AccessLog created successfully',
             'data' => $accessLog,
         ], 201);
+    }
+
+    public function accessPermitidosByAdmin()
+    {
+
+        $access = Notification::where('status', 'Permitido')->first();
+
+        return response()->json($access);
+    }
+    public function update($id)
+    {
+
+        $access = Notification::find($id);
+        if (!$access) {
+            return response()->json(['message' => 'Notificación no encontrada'], 404);
+        }
+        $access->status = 'Permitida Abierta';
+        $access->save();
+        return response()->json($access);
     }
 }

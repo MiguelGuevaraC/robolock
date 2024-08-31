@@ -4,6 +4,7 @@ use App\Http\Controllers\auth\AuthController;
 use App\Http\Controllers\InicioController;
 use App\Http\Controllers\web\AccessController;
 use App\Http\Controllers\web\GroupMenuController;
+use App\Http\Controllers\web\NotificationController;
 use App\Http\Controllers\web\OptionMenuController;
 use App\Http\Controllers\web\PersonController;
 use App\Http\Controllers\web\TypeUserController;
@@ -87,6 +88,16 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('reporteaccesos', [AccessController::class, 'index']);
     Route::get('reporteaccesosAll', [AccessController::class, 'all']);
     Route::get('countRecords', [AccessController::class, 'countRecords']);
+
+    //NOTIFICATION
+    Route::get('notifications', [NotificationController::class, 'index']);
+
+    // Ruta para obtener el conteo de notificaciones pendientes
+    Route::get('notifications/count', [NotificationController::class, 'count']);
+    Route::get('notifications/{id}', [NotificationController::class, 'show']);
+    // Ruta para actualizar el estado de una notificación (a "Visto", por ejemplo)
+    Route::put('notifications/{id}', [NotificationController::class, 'update']);
+    Route::get('notificationsNew', [NotificationController::class, 'getNewNotifications']);
+    Route::put('notifications/{id}/mark-as-seen ', [NotificationController::class, 'markAsSeen']);
+
 });
-
-
