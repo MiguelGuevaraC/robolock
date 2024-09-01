@@ -67,12 +67,15 @@ class ApiController extends Controller
         // Crear un nuevo AccessLog
         $fullPath = $request->input('photoPath');
         $relativePath = str_replace('/var/www/html/robolock/public/', '', $fullPath);
-
-        $relativePath = "robolock/public/"+$relativePath;
+        
+        // Corrige la concatenación para agregar 'robolock/public/'
+        $relativePath = "robolock/public/" . $relativePath;
+        
         $accessLog = Notification::create([
             'photoPath' => $relativePath,
             'state' => 1,
         ]);
+        
         
 
         $accessLog = Notification::find($accessLog->id);
