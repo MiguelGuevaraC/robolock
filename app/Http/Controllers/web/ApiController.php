@@ -68,7 +68,7 @@ class ApiController extends Controller
         $fullPath = $request->input('photoPath');
         $relativePath = str_replace('/var/www/html/robolock/public/', '', $fullPath);
 
-        
+        $relativePath = "robolock/public/"+$relativePath;
         $accessLog = Notification::create([
             'photoPath' => $relativePath,
             'state' => 1,
