@@ -26,31 +26,33 @@ class ApiController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-
-            'status' => 'required|in:Permitido,Denegado', // Cambia los valores según tu lógica
-            'breakPoint' => 'required|string|in:RFID,CAMARA,SISTEMA',
-            'person_id' => 'nullable|exists:people,id', // Asegúrate de que el ID existe en la tabla `people`
+            'status' => 'required|in:Permitido,Denegado', // Asegúrate de que los valores coincidan con la lógica deseada
+            'breakPoint' => 'required|string|in:RFID,CAMARA,SISTEMA', // Define los valores permitidos
+            'person_id' => 'sometimes|nullable|exists:people,id', // Asegúrate de que el ID existe en la tabla `people`
         ]);
-
+    
         if ($validator->fails()) {
             return response()->json([
                 'errors' => $validator->errors(),
             ], 422);
         }
-
+    
         // Crear un nuevo AccessLog
         $accessLog = AccessLog::create([
             'status' => $request->input('status'),
             'breakPoint' => $request->input('breakPoint'),
-            'person_id' => $request->input('person_id'),
+            'person_id' => $request->input('person_id'), // Usar `nullable` en la validación elimina la necesidad de `??null`
         ]);
+    
+        // Recuperar el AccessLog con las relaciones
         $accessLog = AccessLog::with(['authorizedPerson'])->find($accessLog->id);
-
+    
         return response()->json([
             'message' => 'AccessLog created successfully',
             'data' => $accessLog,
         ], 201);
     }
+    
 
     public function storeNotification(Request $request)
     {
