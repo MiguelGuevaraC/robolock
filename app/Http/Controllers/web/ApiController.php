@@ -26,7 +26,7 @@ class ApiController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'status' => 'required|in:Permitido,Denegado', // Asegúrate de que los valores coincidan con la lógica deseada
+            'status' => 'required|string', // Asegúrate de que los valores coincidan con la lógica deseada
             'breakPoint' => 'required|string', // Define los valores permitidos
             // 'person_id' => 'sometimes|nullable|exists:people,id', // Asegúrate de que el ID existe en la tabla `people`
         ]);
