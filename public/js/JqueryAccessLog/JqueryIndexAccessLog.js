@@ -158,7 +158,7 @@ $(document).ready(function () {
                         position: "bottom-end",
                         showConfirmButton: true,
                         confirmButtonText: "Ver Detalles",
-                        timer: 5000,
+                        timer: 10000,
                         didOpen: (toast) => {
                             toast.addEventListener("click", () => {
                                 console.log('Alerta clickeada, mostrando detalles');

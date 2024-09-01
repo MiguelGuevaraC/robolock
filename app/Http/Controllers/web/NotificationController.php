@@ -48,7 +48,7 @@ class NotificationController extends Controller
             // Comparar la contraseña solo si el estado es "Permitido"
             if ($request->password === 'OpenDoor') {
                 $notification->status = $request->status; // Asigna el estado recibido
-                $notification->state = 0; // Marca como procesado
+                $notification->state = 2; // Marca como procesado
                 $notification->save();
     
                 return response()->json(['message' => 'Estado actualizado correctamente'], 200);
