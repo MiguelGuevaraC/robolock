@@ -58,7 +58,7 @@ class NotificationController extends Controller
         } else {
             // Actualizar solo el estado si es "No Permitido" u otro estado
             $notification->status = $request->status; // Asigna el estado recibido
-            $notification->state = 0; // Marca como procesado
+            $notification->state = 2; // Marca como procesado
             $notification->save();
 
             $accessLog = AccessLog::create([
