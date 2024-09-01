@@ -67,13 +67,13 @@ class ApiController extends Controller
         // Crear un nuevo AccessLog
         $accessLog = Notification::create([
             'photoPath' => $request->input('photoPath'),
+            'state' => 1,
         ]);
 
-        $accessLog = AccessLog::find($accessLog->id);
+        $accessLog = Notification::find($accessLog->id);
 
         return response()->json([
-            'message' => 'AccessLog created successfully',
-            'data' => $accessLog,
+            $accessLog
         ], 201);
     }
 
