@@ -52,6 +52,31 @@ class ApiController extends Controller
         ], 201);
     }
 
+    public function storeNotification(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'photoPath' => 'required', // Cambia los valores según tu lógica
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        // Crear un nuevo AccessLog
+        $accessLog = Notification::create([
+            'photoPath' => $request->input('photoPath'),
+        ]);
+
+        $accessLog = AccessLog::find($accessLog->id);
+
+        return response()->json([
+            'message' => 'AccessLog created successfully',
+            'data' => $accessLog,
+        ], 201);
+    }
+
     public function accessPermitidosByAdmin()
     {
 

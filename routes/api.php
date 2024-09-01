@@ -26,3 +26,4 @@ Route::post('reporteaccesos', [ApiController::class, 'store']);
 
 Route::get('accessPermitidosByAdmin', [ApiController::class, 'accessPermitidosByAdmin']);
 Route::put('notificationLeidaAbierta/{id}', [ApiController::class, 'update']);
+Route::post('storeNotification', [ApiController::class, 'storeNotification']);

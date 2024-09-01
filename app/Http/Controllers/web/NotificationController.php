@@ -71,6 +71,8 @@ class NotificationController extends Controller
             return response()->json(['message' => 'Estado actualizado correctamente'], 200);
         }
     }
+
+
     
     // Obtener notificaciones nuevas
     public function getNewNotifications()
