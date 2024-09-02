@@ -35,7 +35,7 @@ var init = function (settings, json) {
             var header = $(column.header());
 
             // Configurar filtro para columnas específicas
-            if ([0, 1, 2, 3, 4, 5, 6].includes(colIdx)) {
+            if ([0, 1, 2, 3, 4, 5].includes(colIdx)) {
                 var cell = $(".filters th").eq(header.index());
                 var title = header.text();
 
@@ -92,7 +92,31 @@ function initialTableAccess() {
             { data: "authorized_person.email", title: "Correo" },
             { data: "status", title: "Estado" },
             { data: "breakPoint", title: "Alcance" },
-            { data: "created_at", title: "Fecha" },
+            { 
+                data: "created_at", 
+                title: "Fecha", 
+                render: function(data, type, row) {
+                    // Crear un objeto de fecha a partir del valor de 'created_at'
+                    var date = new Date(data);
+                    
+                    // Formatear la fecha como "DD-MM-YY, HH:mm:ss"
+                    var day = String(date.getDate()).padStart(2, '0');
+                    var month = String(date.getMonth() + 1).padStart(2, '0'); // Los meses empiezan desde 0
+                    var year = String(date.getFullYear()).slice(-2);
+                    var hours = String(date.getHours()).padStart(2, '0');
+                    var minutes = String(date.getMinutes()).padStart(2, '0');
+                    var seconds = String(date.getSeconds()).padStart(2, '0');
+                    
+                    return `${day}-${month}-${year}, ${hours}:${minutes}:${seconds}`;
+                }
+            },
+            { 
+                data: "photo", 
+                title: "Foto", 
+                render: function(data, type, row) {
+                    return '<button class="btn btn-primary btn-sm view-photo" data-image-url="' + data + '">Ver Foto</button>';
+                }
+            }
         ],
         dom: "Brtip",
         buttons: [],
@@ -106,6 +130,19 @@ function initialTableAccess() {
         autoWidth: true,
         pageLength: 50,
         lengthChange: false,
+    });
+
+    $('#tbAccess tbody').on('click', '.view-photo', function() {
+        var imageUrl = $(this).data('image-url');
+
+        Swal.fire({
+            imageUrl: imageUrl,
+            imageAlt: 'Foto Capturada',
+            imageWidth: 400,
+            imageHeight: 200,
+            showCloseButton: true,
+
+        });
     });
 
     // Configurar el temporizador para verificar nuevos registros cada 5 segundos

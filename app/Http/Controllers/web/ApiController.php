@@ -43,6 +43,7 @@ class ApiController extends Controller
             'status' => $request->input('status'),
             'breakPoint' => $request->input('breakPoint'),
             'person_id' => $request->input('person_id') ?? null,
+            'photo' => $request->input('photo') ?? null,
         ]);
 
         // Recuperar el AccessLog con las relaciones

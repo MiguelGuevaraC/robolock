@@ -13,7 +13,7 @@ return new class extends Migration
             $table->id();
             $table->string('photoPath');
             $table->boolean('state')->default(1)->nullable();
-            $table->string('status');
+            $table->string('status')->nullable();
             $table->timestamps();
             $table->softDeletes();
    

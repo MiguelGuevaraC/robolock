@@ -12,7 +12,7 @@
             <th scope="col">Estado</th>
             <th scope="col">Alcance</th>
             <th scope="col">Fecha</th>
-
+            <th scope="col">Foto</th>
 
 
         </tr>

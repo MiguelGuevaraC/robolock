@@ -17,9 +17,9 @@ return new class extends Migration
             $table->id();
 
             $table->boolean('state')->default(1)->nullable();
-            $table->string('status'); // Authorizado, No Authorizado
-            $table->string('breakPoint');
-
+            $table->string('status')->nullable(); // Authorizado, No Authorizado
+            $table->string('breakPoint')->nullable();
+            $table->string('photo')->nullable();
             $table->timestamps();
             $table->softDeletes();
 

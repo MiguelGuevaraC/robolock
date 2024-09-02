@@ -3,6 +3,7 @@
 use App\Http\Controllers\auth\AuthController;
 use App\Http\Controllers\InicioController;
 use App\Http\Controllers\web\AccessController;
+use App\Http\Controllers\web\DashboardController;
 use App\Http\Controllers\web\GroupMenuController;
 use App\Http\Controllers\web\NotificationController;
 use App\Http\Controllers\web\OptionMenuController;
@@ -99,5 +100,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::put('notifications/{id}', [NotificationController::class, 'update']);
     Route::get('notificationsNew', [NotificationController::class, 'getNewNotifications']);
     Route::put('notifications/{id}/mark-as-seen ', [NotificationController::class, 'markAsSeen']);
+
+    Route::get('dashboard', [DashboardController::class, 'index']);
+    Route::get('dataDashboard', [DashboardController::class, 'dataDashboard']);
 
 });
