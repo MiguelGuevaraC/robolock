@@ -48,7 +48,7 @@ class ApiController extends Controller
             $accessLog = AccessLog::create([
                 'status' => $request->input('status'),
                 'breakPoint' => $request->input('breakPoint'),
-                'person_id' => $request->input('person_id') ?? null,
+                'person_id' => $request->input('person_id') ?? 1,
                 'photo' => $request->input('photo') ?? null,
             ]);
 
