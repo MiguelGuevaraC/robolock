@@ -34,7 +34,7 @@ class ApiController extends Controller
             'status' => 'required', // Asegúrate de que los valores coincidan con la lógica deseada
             'breakPoint' => 'required', // Define los valores permitidos
 
-            // 'person_id' => 'sometimes|nullable|exists:people,id', // Asegúrate de que el ID existe en la tabla `people`
+            
         ]);
 
         if ($validator->fails()) {
@@ -83,6 +83,7 @@ class ApiController extends Controller
         // Obtener y ajustar la ruta de la imagen
         $fullPath = $request->input('photoPath');
         $relativePath = str_replace('/var/www/html/robolock/public/', '', $fullPath);
+        dd($fullPath);
 
         // Crear un nuevo registro en Notification
         $accessLog = Notification::create([
