@@ -388,7 +388,7 @@ def procesar_solicitud():
     """Realiza las acciones cuando se detecta la palabra 'solicitud' o se presiona '1' en consola"""
     lcd_string("Solicitud en proceso", LCD_LINE_1)
     lcd_string("Acerquese a la camara", LCD_LINE_2)
-    reproducir_audio("Solictud en Proceso")
+    reproducir_audio("Petición en Proceso")
     photo_path = capturar_foto()
     if photo_path:
         enviar_foto_a_api(photo_path)
@@ -432,8 +432,8 @@ try:
         print(f"UID leÃ­do: {uid_str}")
         
         # Muestra el UID en el display
-        lcd_string("UID:", LCD_LINE_1)
-        lcd_string(uid_str, LCD_LINE_2)
+        # lcd_string("UID:", LCD_LINE_1)
+        # lcd_string(uid_str, LCD_LINE_2)
 
         # Consulta la API con el UID y muestra la respuesta
         api_response = search_by_uid(uid_str)
@@ -444,9 +444,9 @@ try:
                 user_id = api_response["id"]
                 
                 # Mostrar mensaje de que se acerque a la cÃ¡mara
-                reproducir_audio(f"Hola {names}. Por favor, acÃ©rquese a la cÃ¡mara.")
+                reproducir_audio(f"Hola {names}. Por favor, acerquese a la cÃ¡mara.")
                 lcd_string(f"Hola, {names}", LCD_LINE_1)
-                lcd_string("AcÃ©rquese a la cÃ¡mara", LCD_LINE_2)
+                lcd_string("Acerquese a la cÃ¡mara", LCD_LINE_2)
                 
                 
                 # Esperar un momento para que el usuario vea el mensaje
@@ -462,7 +462,7 @@ try:
                     # Mostrar mensaje de bienvenida
                     lcd_string("Bienvenido, " + names, LCD_LINE_1)
                     lcd_string("Acceso permitido", LCD_LINE_2)
-                    reproducir_audio(f"Bienvenido {names}, puede ingresar.")
+                    # reproducir_audio(f"Bienvenido {names}, puede ingresar.")
 
                     # Registrar acceso permitido
                     report_access(status="Permitido", breakPoint="CAMARA", person_id=user_id)

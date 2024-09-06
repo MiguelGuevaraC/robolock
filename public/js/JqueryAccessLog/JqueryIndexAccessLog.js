@@ -110,13 +110,13 @@ function initialTableAccess() {
                     return `${day}-${month}-${year}, ${hours}:${minutes}:${seconds}`;
                 }
             },
-            { 
-                data: "photo", 
-                title: "Foto", 
-                render: function(data, type, row) {
-                    return '<button class="btn btn-primary btn-sm view-photo" data-image-url="' + data + '">Ver Foto</button>';
-                }
-            }
+            // { 
+            //     data: "photo", 
+            //     title: "Foto", 
+            //     render: function(data, type, row) {
+            //         return '<button class="btn btn-primary btn-sm view-photo" data-image-url="' + data + '">Ver Foto</button>';
+            //     }
+            // }
         ],
         dom: "Brtip",
         buttons: [],
