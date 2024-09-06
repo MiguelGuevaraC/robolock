@@ -68,7 +68,7 @@
 
 
 
-    <link rel="stylesheet" href="/manuelPardoWhatsapp/Cdn-Locales/pkgAwsome/css/all.css" />
+    <link rel="stylesheet" href="/robolock/Cdn-Locales/pkgAwsome/css/all.css" />
 
     <!--Demo [ DEMONSTRATION ]-->
     <link href="plantillaNuevo\css\demo\nifty-demo.min.css" rel="stylesheet">
@@ -495,7 +495,7 @@
 
 
     <!-- PARA MODAL DE ALERTAS SWEETALERT2-->
-    <script src="/manuelPardoWhatsapp/Cdn-Locales/pkgSweetAlert/dist/sweetalert2.all.js"></script>
+    <script src="/robolock/Cdn-Locales/pkgSweetAlert/dist/sweetalert2.all.js"></script>
 
     <!--=================================================-->
 
@@ -514,7 +514,7 @@
 
     <script src="{{ asset('js/app.js') }}"></script>
     <script src="{{ asset('js/JqueryInicio/JqueryInicio.js') }}"></script>
-    <script src="/manuelPardoWhatsapp/Cdn-Locales/pkgAwsome/js/all.js"></script>
+    <script src="/robolock/Cdn-Locales/pkgAwsome/js/all.js"></script>
     <!-- Include Bootstrap CSS -->
 
     <!-- Include Chart.js -->
@@ -620,9 +620,9 @@
                 });
     
                 // Actualizar valores de total de mensajes y costo total
-                $("#accessPermitidos").text("S/ " + accessPermitidos);
+                $("#accessPermitidos").text( accessPermitidos);
                 $("#accessDenegados").text(accessDenegados);
-                $("#accessByDay").text("S/ " + accessByDay);
+                $("#accessByDay").text( accessByDay);
             }
     
             // Opciones comunes para los gráficos
