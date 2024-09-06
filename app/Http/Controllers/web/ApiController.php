@@ -43,13 +43,16 @@ class ApiController extends Controller
             ], 422);
         }
 
+        $fullPath = $request->input('photo');
+        $relativePath = str_replace('/var/www/html/robolock/public/', '', $fullPath);
+
         try {
             // Crear un nuevo AccessLog
             $accessLog = AccessLog::create([
                 'status' => $request->input('status'),
                 'breakPoint' => $request->input('breakPoint'),
                 'person_id' => $request->input('person_id') ?? 1,
-                'photo' => $request->input('photo') ?? null,
+                'photo' => $relativePath ?? null,
             ]);
 
             // Recuperar el AccessLog con las relaciones
