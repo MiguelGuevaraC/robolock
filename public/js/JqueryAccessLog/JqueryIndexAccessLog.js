@@ -226,7 +226,7 @@ $(document).ready(function () {
                 title: "Detalles de la Solicitud de Acceso",
                 html: `
                     <div style="text-align: center;">
-                        <img src="/${data.photoPath}" alt="Imagen del Ingresante" style="width: 300px; height: 200px; object-fit: cover; border-radius: 8px;">
+                        <img src="${data.photoPath}" alt="Imagen del Ingresante" style="width: 300px; height: 200px; object-fit: cover; border-radius: 8px;">
                         <p style="margin-top: 10px;">Solicitud recibida el ${text}</p>
                         <p style="font-weight: bold; margin-top: 10px;">Ingrese su contraseña para validar:</p>
                         <input type="password" id="access-password-${data.id}" class="swal2-input" placeholder="Contraseña" style="margin-top: 10px;">

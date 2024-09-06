@@ -83,7 +83,7 @@ class ApiController extends Controller
         // Obtener y ajustar la ruta de la imagen
         $fullPath = $request->input('photoPath');
         $relativePath = str_replace('/var/www/html/robolock/public/', '', $fullPath);
-        dd($relativePath );
+        
 
         // Crear un nuevo registro en Notification
         $accessLog = Notification::create([
