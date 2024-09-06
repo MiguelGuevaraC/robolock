@@ -10,6 +10,7 @@ use App\Models\Person;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
@@ -32,7 +33,7 @@ class ApiController extends Controller
         $validator = Validator::make($request->all(), [
             'status' => 'required', // Asegúrate de que los valores coincidan con la lógica deseada
             'breakPoint' => 'required', // Define los valores permitidos
-            
+
             // 'person_id' => 'sometimes|nullable|exists:people,id', // Asegúrate de que el ID existe en la tabla `people`
         ]);
 
@@ -113,22 +114,28 @@ class ApiController extends Controller
         ], 201);
     }
 
-    public function send(string $to = '', string $subject = '', array $body = [])
-    {
-        $receptor = $to ?? 'mguevaracaj@unprg.edu.pe';
-        $asunto = $subject ?? 'Asunto del correo';
+public function send(string $to = '', string $subject = '', array $body = [])
+{
+    $receptor = $to ?? 'mguevaracaj@unprg.edu.pe';
+    $asunto = $subject ?? 'Asunto del correo';
 
-        // Crear una instancia de la clase Mailable y establecer la vista HTML
-        $correo = new ExampleMail($asunto, $body);
+    // Crear una instancia de la clase Mailable y establecer la vista HTML
+    $correo = new ExampleMail($asunto, $body);
 
-        // Enviar el correo electrónico
-        try {
-            Mail::to($receptor)->send($correo);
-        } catch (Exception $e) {
-            // Maneja la excepción aquí, por ejemplo, registrando el error o mostrando un mensaje.
-            echo ('Error al enviar el correo: ' . $e->getMessage());
-        }
+    // Registrar log antes de enviar el correo
+    Log::info("Intentando enviar un correo a: {$receptor} con el asunto: {$asunto}");
+
+    // Enviar el correo electrónico
+    try {
+        Mail::to($receptor)->send($correo);
+        // Registrar log después de enviar el correo exitosamente
+        Log::info("Correo enviado exitosamente a: {$receptor}");
+    } catch (Exception $e) {
+        // Registrar el error en los logs
+        Log::error("Error al enviar el correo a: {$receptor}. Detalles: " . $e->getMessage());
+        echo ('Error al enviar el correo: ' . $e->getMessage());
     }
+}
 
     public function accessPermitidosByAdmin()
     {
