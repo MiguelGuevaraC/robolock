@@ -32,6 +32,7 @@ class ApiController extends Controller
         $validator = Validator::make($request->all(), [
             'status' => 'required', // Asegúrate de que los valores coincidan con la lógica deseada
             'breakPoint' => 'required', // Define los valores permitidos
+            
             // 'person_id' => 'sometimes|nullable|exists:people,id', // Asegúrate de que el ID existe en la tabla `people`
         ]);
 
